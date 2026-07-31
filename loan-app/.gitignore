@@ -1,0 +1,14 @@
+# Flutter
+.dart_tool/
+build/
+**/build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Android
+*.apk
+*.aab
+
+# React
+node_modules/
+dist/
