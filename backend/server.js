@@ -54,8 +54,8 @@ const {
 } = process.env
 
 const useSender = MSG91_USE_SENDER === 'true'
-/** MSG91 OTP digit length — must match UI (4 boxes) and DLT template. */
-const MSG91_OTP_LENGTH = 4
+/** MSG91 OTP digit length — must match UI (6 boxes) and DLT template. */
+const MSG91_OTP_LENGTH = Number(process.env.MSG91_OTP_LENGTH) || 6
 /** OTP validity window in minutes for send + verify. */
 const MSG91_OTP_EXPIRY_MINUTES = 10
 
@@ -504,24 +504,6 @@ app.get('/api/admin/me', requireAdminAuth, (req, res) => {
   })
 })
 
-async function getMsg91SmsBalance() {
-  // type 4 = transactional SMS (OTP); type 1 = promotional
-  const types = [4, 1]
-  for (const type of types) {
-    try {
-      const response = await axios.get('https://control.msg91.com/api/balance.php', {
-        params: { authkey: MSG91_AUTH_KEY, type },
-        timeout: 10000,
-      })
-      const raw = response.data
-      const value = typeof raw === 'number' ? raw : Number(raw)
-      if (Number.isFinite(value)) return { type, balance: value }
-    } catch {
-      // try next balance type
-    }
-  }
-  return null
-}
 
 async function sendOtpToMobile(normalizedMobile) {
   const params = {
@@ -568,17 +550,6 @@ async function handleSendOtpRequest(normalizedMobile, res) {
   }
 
   try {
-    const wallet = await getMsg91SmsBalance()
-    if (wallet && wallet.balance <= 0) {
-      console.error('MSG91 SMS balance is 0 — OTP SMS will not be delivered.')
-      return res.status(502).json({
-        success: false,
-        message:
-          'OTP SMS cannot be sent right now because the MSG91 SMS wallet has no balance. Please recharge MSG91 and try again.',
-        data: { balance: wallet.balance, balanceType: wallet.type },
-      })
-    }
-
     const response = await sendOtpToMobile(normalizedMobile)
     console.log('MSG91 send response:', response.data)
 
@@ -596,7 +567,6 @@ async function handleSendOtpRequest(normalizedMobile, res) {
       message: 'OTP sent successfully to your mobile number.',
       data: {
         mobile: normalizedMobile,
-        ...(wallet ? { balance: wallet.balance } : {}),
       },
     })
   } catch (error) {

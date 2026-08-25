@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { isOtpVerifyAccepted, otpFailureMessage } from '../utils/otpValidation'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
-const OTP_LENGTH = 4
+const OTP_LENGTH = 6
 const RESEND_SECONDS = 60
 
 function UserSignInModal({ onClose, onSignedIn }) {
@@ -177,7 +177,7 @@ function UserSignInModal({ onClose, onSignedIn }) {
       ? 'Sign in with your registered mobile number and password.'
       : otpStep === 'mobile'
         ? 'Enter the mobile number used for your loan application.'
-        : `Enter the 4-digit OTP sent to +91 ${cleanedMobile}`
+        : `Enter the 6-digit OTP sent to +91 ${cleanedMobile}`
 
   return (
     <>

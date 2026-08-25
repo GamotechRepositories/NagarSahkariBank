@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { isOtpVerifyAccepted, otpFailureMessage } from '../utils/otpValidation'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
-const OTP_LENGTH = 4
+const OTP_LENGTH = 6
 const RESEND_SECONDS = 60
 
 function OtpVerificationSheet({ mobile, onClose, onVerified }) {
@@ -138,7 +138,7 @@ function OtpVerificationSheet({ mobile, onClose, onVerified }) {
           </button>
         </div>
         <p className="mb-5 text-sm text-slate-500 sm:mb-6">
-          Please enter the 4-digit OTP sent to +91 {String(mobile || '').replace(/\D/g, '')}
+          Please enter the 6-digit OTP sent to +91 {String(mobile || '').replace(/\D/g, '')}
         </p>
 
         <div className="flex justify-between gap-2 sm:gap-3" onPaste={handlePaste}>
