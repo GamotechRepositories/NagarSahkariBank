@@ -173,7 +173,6 @@ function App() {
     setOtpSendError('')
     setStatus(null)
     setOtpVerifiedMobile('')
-    setApplyPhase('otp')
     try {
       const response = await fetch(`${API_BASE}/api/otp/send`, {
         method: 'POST',
@@ -183,10 +182,15 @@ function App() {
       const data = await response.json()
       if (response.ok && data.success) {
         setOtpSendError('')
+        setApplyPhase('otp')
       } else {
+        setApplyPhase('mobile')
+        setStatus({ type: 'error', message: data.message || 'Failed to send OTP.' })
         setOtpSendError(data.message || 'Failed to send OTP.')
       }
     } catch {
+      setApplyPhase('mobile')
+      setStatus({ type: 'error', message: 'Could not reach the server. Please try again.' })
       setOtpSendError('Could not reach the server. Please try again.')
     } finally {
       setLoading(false)

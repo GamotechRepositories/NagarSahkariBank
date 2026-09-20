@@ -38,6 +38,7 @@ const dataDir = path.join(__dirname, 'data')
 const submissionsFile = path.join(dataDir, 'kyc-submissions.json')
 const usersFile = path.join(dataDir, 'users.json')
 const contactInquiriesFile = path.join(dataDir, 'contact-inquiries.json')
+const otpChallengesFile = path.join(dataDir, 'otp-challenges.json')
 
 fs.mkdirSync(uploadsDir, { recursive: true })
 fs.mkdirSync(dataDir, { recursive: true })
@@ -388,8 +389,44 @@ function fast2smsHeaders() {
   }
 }
 
-/** Pending OTP challenges: mobile -> { requestId, sentAt, attempts } */
+/** Pending OTP challenges: mobile -> { requestId, otpHash, sentAt, attempts } */
 const pendingOtpChallenges = new Map()
+
+function readOtpChallengesFromDisk() {
+  try {
+    const raw = JSON.parse(fs.readFileSync(otpChallengesFile, 'utf8'))
+    if (!raw || typeof raw !== 'object') return
+    for (const [mobile, challenge] of Object.entries(raw)) {
+      if (challenge && typeof challenge === 'object') {
+        pendingOtpChallenges.set(mobile, challenge)
+      }
+    }
+  } catch {
+    // No saved OTP challenges yet.
+  }
+}
+
+function writeOtpChallengesToDisk() {
+  fs.writeFileSync(
+    otpChallengesFile,
+    JSON.stringify(Object.fromEntries(pendingOtpChallenges), null, 2),
+  )
+}
+
+function pruneExpiredOtpChallenges() {
+  const maxAgeMs = fast2sms.otpExpiryMinutes * 60 * 1000
+  let changed = false
+  for (const [mobile, challenge] of pendingOtpChallenges.entries()) {
+    if (!challenge?.sentAt || Date.now() - challenge.sentAt > maxAgeMs) {
+      pendingOtpChallenges.delete(mobile)
+      changed = true
+    }
+  }
+  if (changed) writeOtpChallengesToDisk()
+}
+
+readOtpChallengesFromDisk()
+pruneExpiredOtpChallenges()
 
 function rememberOtpChallenge(mobile, { requestId = null, otpHash = null } = {}) {
   pendingOtpChallenges.set(mobile, {
@@ -398,14 +435,17 @@ function rememberOtpChallenge(mobile, { requestId = null, otpHash = null } = {})
     sentAt: Date.now(),
     attempts: 0,
   })
+  writeOtpChallengesToDisk()
 }
 
 function getActiveOtpChallenge(mobile) {
+  pruneExpiredOtpChallenges()
   const challenge = pendingOtpChallenges.get(mobile)
   if (!challenge) return null
   const maxAgeMs = fast2sms.otpExpiryMinutes * 60 * 1000
   if (Date.now() - challenge.sentAt > maxAgeMs) {
     pendingOtpChallenges.delete(mobile)
+    writeOtpChallengesToDisk()
     return null
   }
   return challenge
@@ -413,6 +453,12 @@ function getActiveOtpChallenge(mobile) {
 
 function clearOtpChallenge(mobile) {
   pendingOtpChallenges.delete(mobile)
+  writeOtpChallengesToDisk()
+}
+
+function updateOtpChallenge(mobile, challenge) {
+  pendingOtpChallenges.set(mobile, challenge)
+  writeOtpChallengesToDisk()
 }
 
 function safeEqual(a, b) {
@@ -533,11 +579,10 @@ async function sendOtpViaSmartApi(normalizedMobile) {
   return { response, otpHash: null }
 }
 
-async function sendOtpViaLocalBulk(normalizedMobile) {
-  const otp = generateOtpCode()
+async function sendOtpViaLocalBulk(normalizedMobile, otp) {
   const message = fast2sms.localMessage.replaceAll('##OTP##', otp)
 
-  const response = await axios.post(
+  return axios.post(
     `${fast2sms.baseUrl}${fast2sms.bulkPath}`,
     {
       route: fast2sms.localRoute,
@@ -549,15 +594,19 @@ async function sendOtpViaLocalBulk(normalizedMobile) {
       timeout: 15000,
     },
   )
-
-  return { response, otpHash: hashOtpCode(otp) }
 }
 
 async function sendOtpToMobile(normalizedMobile) {
   if (fast2sms.mode === 'smart') {
     return sendOtpViaSmartApi(normalizedMobile)
   }
-  return sendOtpViaLocalBulk(normalizedMobile)
+
+  const otp = generateOtpCode()
+  const otpHash = hashOtpCode(otp)
+  rememberOtpChallenge(normalizedMobile, { otpHash })
+
+  const response = await sendOtpViaLocalBulk(normalizedMobile, otp)
+  return { response, otpHash }
 }
 
 async function verifyOtpForMobile(normalizedMobile, otp) {
@@ -585,6 +634,9 @@ async function handleSendOtpRequest(normalizedMobile, res) {
     console.log(`Fast2SMS send response (${fast2sms.mode}):`, response.data)
 
     if (!isFast2SmsSuccess(response.data)) {
+      if (fast2sms.mode === 'local') {
+        clearOtpChallenge(normalizedMobile)
+      }
       return res.status(400).json({
         success: false,
         message: response.data?.message || 'Failed to send OTP.',
@@ -592,10 +644,19 @@ async function handleSendOtpRequest(normalizedMobile, res) {
       })
     }
 
-    rememberOtpChallenge(normalizedMobile, {
-      requestId: response.data?.request_id,
-      otpHash,
-    })
+    if (fast2sms.mode === 'smart') {
+      rememberOtpChallenge(normalizedMobile, {
+        requestId: response.data?.request_id,
+        otpHash: null,
+      })
+    } else {
+      updateOtpChallenge(normalizedMobile, {
+        requestId: response.data?.request_id || null,
+        otpHash,
+        sentAt: Date.now(),
+        attempts: 0,
+      })
+    }
     return res.json({
       success: true,
       message: 'OTP sent successfully to your mobile number.',
@@ -604,6 +665,9 @@ async function handleSendOtpRequest(normalizedMobile, res) {
       },
     })
   } catch (error) {
+    if (fast2sms.mode === 'local') {
+      clearOtpChallenge(normalizedMobile)
+    }
     const statusCode = error.response?.status || 500
     const apiError = error.response?.data || { message: error.message }
     console.error('Fast2SMS send error:', apiError)
@@ -648,7 +712,7 @@ async function handleVerifyOtpRequest(normalizedMobile, otp, res, { onVerified }
   if (fast2sms.mode === 'local') {
     if (!challenge.otpHash || hashOtpCode(normalizedOtp) !== challenge.otpHash) {
       challenge.attempts += 1
-      pendingOtpChallenges.set(normalizedMobile, challenge)
+      updateOtpChallenge(normalizedMobile, challenge)
       return res.status(400).json({
         success: false,
         message: 'Invalid OTP. Please try again.',
@@ -665,7 +729,7 @@ async function handleVerifyOtpRequest(normalizedMobile, otp, res, { onVerified }
 
     if (!isFast2SmsSuccess(response.data)) {
       challenge.attempts += 1
-      pendingOtpChallenges.set(normalizedMobile, challenge)
+      updateOtpChallenge(normalizedMobile, challenge)
       return res.status(400).json({
         success: false,
         message: response.data?.message || 'Invalid OTP. Please try again.',
@@ -677,7 +741,7 @@ async function handleVerifyOtpRequest(normalizedMobile, otp, res, { onVerified }
     return onVerified({ fast2sms: response.data })
   } catch (error) {
     challenge.attempts += 1
-    pendingOtpChallenges.set(normalizedMobile, challenge)
+    updateOtpChallenge(normalizedMobile, challenge)
     const statusCode = error.response?.status || 500
     const apiError = error.response?.data || { message: error.message }
     console.error('Fast2SMS verify error:', apiError)
