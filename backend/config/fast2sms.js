@@ -75,11 +75,15 @@ export function validateFast2SmsConfig(config) {
   return null
 }
 
+function isTruthyReturn(value) {
+  return value === true || value === 'true' || value === 1 || value === '1'
+}
+
 export function isFast2SmsSuccess(data) {
   if (!data || typeof data !== 'object') return false
-  if (data.return !== true) return false
+  if (!isTruthyReturn(data.return)) return false
   // Local bulk route (route q) returns { return: true, request_id } without status_code.
-  if (data.status_code == null) return true
+  if (data.status_code == null || data.status_code === '') return true
   return Number(data.status_code) === 200
 }
 

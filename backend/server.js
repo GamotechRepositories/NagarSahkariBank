@@ -585,7 +585,8 @@ async function handleSendOtpRequest(normalizedMobile, res) {
     const { response, otpHash } = await sendOtpToMobile(normalizedMobile)
     console.log(`Fast2SMS send response (${fast2sms.mode}):`, response.data)
 
-    if (!isFast2SmsSuccess(response.data)) {
+    const smsSent = isFast2SmsSuccess(response.data)
+    if (!smsSent) {
       return res.status(400).json({
         success: false,
         message: fast2SmsMessage(response.data) || 'Failed to send OTP.',
@@ -599,6 +600,17 @@ async function handleSendOtpRequest(normalizedMobile, res) {
         otpHash: null,
       })
     }
+
+    const activeSession = getActiveOtpChallenge(normalizedMobile)
+    if (!activeSession) {
+      console.error(`OTP session missing after successful send for ${normalizedMobile}`)
+      return res.status(500).json({
+        success: false,
+        message: 'OTP was sent but the verification session could not be saved. Please try again.',
+      })
+    }
+
+    console.log(`OTP session active for ${normalizedMobile} (expires in ${fast2sms.otpExpiryMinutes} min)`)
 
     return res.json({
       success: true,
