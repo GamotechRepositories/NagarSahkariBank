@@ -200,14 +200,17 @@ function App() {
         body: JSON.stringify({ mobile: cleanedMobile }),
       })
       const data = await response.json()
+      const apiMessage = Array.isArray(data.message)
+        ? data.message.join(' ')
+        : data.message || 'Failed to send OTP.'
       if (response.ok && data.success) {
         saveOtpSession(cleanedMobile)
         setOtpSendError('')
         setApplyPhase('otp')
       } else {
         setApplyPhase('mobile')
-        setStatus({ type: 'error', message: data.message || 'Failed to send OTP.' })
-        setOtpSendError(data.message || 'Failed to send OTP.')
+        setStatus({ type: 'error', message: apiMessage })
+        setOtpSendError(apiMessage)
       }
     } catch {
       setApplyPhase('mobile')
