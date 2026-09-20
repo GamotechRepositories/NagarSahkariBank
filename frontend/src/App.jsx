@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react'
 import HeroSection from './components/HeroSection'
 import LoanForm from './components/LoanForm'
 import LoanInfoSections from './components/LoanInfoSections'
-import OtpVerificationStep from './components/OtpVerificationStep'
 import BasicDetailsPage from './components/BasicDetailsPage'
 import ApprovedOfferPage from './components/ApprovedOfferPage'
 import CompleteKycPage from './components/CompleteKycPage'
@@ -15,8 +14,6 @@ import { API_BASE } from './config/api'
 import {
   clearOtpSession,
   getOtpSession,
-  hasPendingOtpSession,
-  normalizeMobile,
   saveOtpSession,
 } from './utils/otpSession'
 const USER_TOKEN_KEY = 'user_auth_token'
@@ -222,18 +219,6 @@ function App() {
     setCurrentStep(1)
   }
 
-  function handleOtpBack() {
-    setApplyPhase('mobile')
-    setOtpSendError('')
-  }
-
-  function handleContinueOtp() {
-    const pendingSession = getOtpSession()
-    if (!pendingSession) return
-    setMobileNumber(pendingSession.mobile)
-    setApplyPhase('otp')
-  }
-
   if (checkingSession) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-slate-100">
@@ -276,19 +261,6 @@ function App() {
           />
         ) : null}
       </>
-    )
-  }
-
-  if (appMode === 'apply' && currentStep === 0 && applyPhase === 'otp') {
-    const otpMobile = normalizeMobile(cleanedMobile || getOtpSession()?.mobile)
-    return (
-      <OtpVerificationStep
-        mobile={otpMobile}
-        sending={otpSending}
-        sendError={otpSendError}
-        onBack={handleOtpBack}
-        onVerified={handleOtpVerified}
-      />
     )
   }
 
@@ -403,8 +375,10 @@ function App() {
               status={status}
               setStatus={setStatus}
               onSendOtp={handleSendOtp}
-              hasPendingOtp={hasPendingOtpSession(cleanedMobile)}
-              onContinueOtp={handleContinueOtp}
+              applyPhase={applyPhase}
+              otpSendError={otpSendError}
+              otpSending={otpSending}
+              onOtpVerified={handleOtpVerified}
             />
           </section>
 
@@ -416,36 +390,6 @@ function App() {
           </div>
         </div>
 
-        <div className="fixed bottom-0 left-0 right-0 z-30 border-t border-slate-200 bg-white/95 px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur lg:hidden">
-          <div className="mx-auto w-full max-w-md">
-            {status && (
-              <p
-                className={`mb-2 rounded-xl px-4 py-2 text-sm font-medium ${
-                  status.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'
-                }`}
-              >
-                {status.message}
-              </p>
-            )}
-            {hasPendingOtpSession(cleanedMobile) ? (
-              <button
-                type="button"
-                onClick={handleContinueOtp}
-                className="mb-2 w-full rounded-xl border border-[var(--brand)] bg-white py-3 text-base font-semibold text-[var(--brand)]"
-              >
-                Continue to Enter OTP
-              </button>
-            ) : null}
-            <button
-              type="button"
-              disabled={!isOtpEnabled || loading}
-              onClick={handleSendOtp}
-              className="w-full rounded-xl bg-[var(--brand)] py-3 text-base font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
-            >
-              {loading ? 'Sending...' : hasPendingOtpSession(cleanedMobile) ? 'Resend OTP' : 'Get OTP'}
-            </button>
-          </div>
-        </div>
       </div>
 
     </main>
