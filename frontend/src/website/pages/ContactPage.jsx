@@ -3,7 +3,7 @@ import { COMPANY } from '../websiteContent'
 import { Icon } from '../Icons'
 import { ContentSection, FaqList, PageHero } from '../WebsiteUi'
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'
+import { API_BASE } from '../../config/api'
 
 const EMPTY_FORM = {
   fullName: '',

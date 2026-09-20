@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { isOtpVerifyAccepted, otpFailureMessage } from '../utils/otpValidation'
 import { COMPANY } from '../website/websiteContent'
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
+import { API_BASE } from '../config/api'
 const OTP_LENGTH = 6
 const RESEND_SECONDS = 60
 
@@ -114,12 +114,6 @@ function UserSignInModal({ onClose, onSignedIn, onSignUp }) {
     if (char && index < OTP_LENGTH - 1) {
       inputRefs.current[index + 1]?.focus()
     }
-    if (updated.every((d) => d !== '')) {
-      queueMicrotask(() => {
-        const otp = updated.join('')
-        if (otp.length === OTP_LENGTH) verifyOtpWith(otp)
-      })
-    }
   }
 
   async function verifyOtpWith(otp) {
@@ -168,8 +162,13 @@ function UserSignInModal({ onClose, onSignedIn, onSignUp }) {
     setDigits(updated)
     const focusIdx = Math.min(pasted.length, OTP_LENGTH - 1)
     inputRefs.current[focusIdx]?.focus()
-    if (pasted.length === OTP_LENGTH) {
-      queueMicrotask(() => verifyOtpWith(pasted))
+  }
+
+  function handleOtpKeyDown(index, event) {
+    handleKeyDown(index, event)
+    if (event.key === 'Enter' && digits.every((d) => d !== '')) {
+      event.preventDefault()
+      verifyOtpWith(digits.join(''))
     }
   }
 
@@ -374,7 +373,7 @@ function UserSignInModal({ onClose, onSignedIn, onSignUp }) {
                   maxLength={1}
                   value={digit}
                   onChange={(e) => handleDigitChange(index, e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(index, e)}
+                  onKeyDown={(e) => handleOtpKeyDown(index, e)}
                   aria-label={`OTP digit ${index + 1}`}
                   className={`h-14 w-full rounded-2xl border-2 text-center text-xl font-semibold text-slate-900 outline-none transition-colors ${
                     digit

@@ -11,8 +11,7 @@ import UserSignInModal from './components/UserSignInModal'
 import WelcomeProfilePopup from './components/WelcomeProfilePopup'
 import CompanyWebsite from './website/CompanyWebsite'
 import { COMPANY } from './website/websiteContent'
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
+import { API_BASE } from './config/api'
 const USER_TOKEN_KEY = 'user_auth_token'
 
 function App() {
@@ -23,6 +22,7 @@ function App() {
   const [loading, setLoading] = useState(false)
   const [status, setStatus] = useState(null)
   const [showOtpSheet, setShowOtpSheet] = useState(false)
+  const [otpVerifiedMobile, setOtpVerifiedMobile] = useState('')
   const [appMode, setAppMode] = useState('website')
   const [currentStep, setCurrentStep] = useState(0)
   const [applicationData, setApplicationData] = useState({
@@ -46,6 +46,21 @@ function App() {
   const cleanedMobile = mobileNumber.replace(/\D/g, '').slice(0, 10)
   const isMobileValid = cleanedMobile.length === 10
   const isOtpEnabled = isMobileValid && consentOne && consentTwo && consentThree
+  const isCurrentMobileVerified = otpVerifiedMobile === cleanedMobile && cleanedMobile.length === 10
+
+  useEffect(() => {
+    if (otpVerifiedMobile && otpVerifiedMobile !== cleanedMobile) {
+      setOtpVerifiedMobile('')
+      setCurrentStep(0)
+    }
+  }, [cleanedMobile, otpVerifiedMobile])
+
+  useEffect(() => {
+    if (currentStep > 0 && !isCurrentMobileVerified) {
+      setCurrentStep(0)
+      setShowOtpSheet(true)
+    }
+  }, [currentStep, isCurrentMobileVerified])
 
   const clearUserSession = useCallback(() => {
     localStorage.removeItem(USER_TOKEN_KEY)
@@ -159,7 +174,8 @@ function App() {
       })
       const data = await response.json()
       if (response.ok && data.success) {
-        setStatus({ type: 'success', message: data.message || 'OTP sent successfully!' })
+        setOtpVerifiedMobile('')
+        setStatus(null)
         setShowOtpSheet(true)
       } else {
         setStatus({ type: 'error', message: data.message || 'Failed to send OTP.' })
@@ -216,7 +232,7 @@ function App() {
     )
   }
 
-  if (currentStep === 1) {
+  if (currentStep === 1 && isCurrentMobileVerified) {
     return (
       <BasicDetailsPage
         onContinue={(details) => {
@@ -366,7 +382,9 @@ function App() {
           mobile={cleanedMobile}
           onClose={() => setShowOtpSheet(false)}
           onVerified={() => {
+            setOtpVerifiedMobile(cleanedMobile)
             setShowOtpSheet(false)
+            setStatus({ type: 'success', message: 'Mobile number verified successfully.' })
             setCurrentStep(1)
           }}
         />

@@ -16,7 +16,7 @@ import {
   sanitizePan,
 } from '../utils/idValidation'
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
+import { API_BASE } from '../config/api'
 
 const initialPrefs = {
   sms: true,

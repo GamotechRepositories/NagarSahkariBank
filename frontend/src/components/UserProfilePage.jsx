@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { isLoanFullyApproved } from '../utils/userNotifications'
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
+import { API_BASE } from '../config/api'
 
 const LOAN_PURPOSE_LABELS = {
   medical: 'Medical Emergency',

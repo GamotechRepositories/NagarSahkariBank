@@ -14,8 +14,16 @@ import {
   sanitizeAadhaar,
   sanitizePan,
 } from './utils/idValidation.js'
+import {
+  describeFast2SmsMode,
+  isFast2SmsSuccess,
+  loadFast2SmsConfig,
+  validateFast2SmsConfig,
+} from './config/fast2sms.js'
 
 dotenv.config()
+
+const fast2sms = loadFast2SmsConfig()
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -47,22 +55,11 @@ if (!fs.existsSync(contactInquiriesFile)) {
 }
 
 const {
-  MSG91_AUTH_KEY,
-  MSG91_TEMPLATE_ID,
-  MSG91_SENDER_ID,
-  MSG91_BASE_URL = 'https://control.msg91.com/api/v5',
-  MSG91_USE_SENDER = 'false',
   PORT = 5000,
   ADMIN_USERNAME = 'admin',
   ADMIN_PASSWORD = 'admin123',
   JWT_SECRET = 'sakaar-microcredit-admin-jwt-secret-change-me',
 } = process.env
-
-const useSender = MSG91_USE_SENDER === 'true'
-/** MSG91 OTP digit length — must match UI (6 boxes) and DLT template. */
-const MSG91_OTP_LENGTH = Number(process.env.MSG91_OTP_LENGTH) || 6
-/** OTP validity window in minutes for send + verify. */
-const MSG91_OTP_EXPIRY_MINUTES = 10
 
 const storage = multer.diskStorage({
   destination: (_req, _file, cb) => cb(null, uploadsDir),
@@ -368,43 +365,36 @@ function normalizeIndianMobile(mobile) {
   return null
 }
 
-function validateMsg91Config() {
-  if (!MSG91_AUTH_KEY || !MSG91_TEMPLATE_ID) {
-    return 'Missing MSG91_AUTH_KEY or MSG91_TEMPLATE_ID in environment.'
-  }
-  return null
-}
-
-function isMsg91OtpSuccess(data) {
-  if (!data || typeof data !== 'object') return false
-  const type = String(data.type || '').toLowerCase()
-  // Strict: MSG91 must return type "success". Never treat ambiguous payloads as verified.
-  if (type !== 'success') return false
-  const message = String(data.message || '').toLowerCase()
-  if (
-    message.includes('not match') ||
-    message.includes('invalid') ||
-    message.includes('expired') ||
-    message.includes('already verified') ||
-    message.includes('no otp')
-  ) {
-    return false
-  }
-  return true
-}
-
 function normalizeOtpCode(otp) {
   const digits = String(otp || '').replace(/\D/g, '')
-  if (digits.length !== MSG91_OTP_LENGTH) return null
+  if (digits.length !== fast2sms.otpLength) return null
   return digits
+}
+
+function generateOtpCode() {
+  const max = 10 ** fast2sms.otpLength
+  return String(crypto.randomInt(0, max)).padStart(fast2sms.otpLength, '0')
+}
+
+function hashOtpCode(otp) {
+  return crypto.createHash('sha256').update(String(otp)).digest('hex')
+}
+
+function fast2smsHeaders() {
+  return {
+    Authorization: fast2sms.apiKey,
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  }
 }
 
 /** Pending OTP challenges: mobile -> { requestId, sentAt, attempts } */
 const pendingOtpChallenges = new Map()
 
-function rememberOtpChallenge(mobile, requestId) {
+function rememberOtpChallenge(mobile, { requestId = null, otpHash = null } = {}) {
   pendingOtpChallenges.set(mobile, {
-    requestId: requestId || null,
+    requestId,
+    otpHash,
     sentAt: Date.now(),
     attempts: 0,
   })
@@ -413,7 +403,7 @@ function rememberOtpChallenge(mobile, requestId) {
 function getActiveOtpChallenge(mobile) {
   const challenge = pendingOtpChallenges.get(mobile)
   if (!challenge) return null
-  const maxAgeMs = MSG91_OTP_EXPIRY_MINUTES * 60 * 1000
+  const maxAgeMs = fast2sms.otpExpiryMinutes * 60 * 1000
   if (Date.now() - challenge.sentAt > maxAgeMs) {
     pendingOtpChallenges.delete(mobile)
     return null
@@ -523,55 +513,78 @@ app.get('/api/admin/me', requireAdminAuth, (req, res) => {
 })
 
 
-async function sendOtpToMobile(normalizedMobile) {
-  const params = {
-    mobile: `91${normalizedMobile}`,
-    template_id: MSG91_TEMPLATE_ID,
-    otp_length: MSG91_OTP_LENGTH,
-    otp_expiry: MSG91_OTP_EXPIRY_MINUTES,
+async function sendOtpViaSmartApi(normalizedMobile) {
+  const body = {
+    otp_id: fast2sms.otpId,
+    mobile: normalizedMobile,
+    otp_length: fast2sms.otpLength,
+    otp_expiry: fast2sms.otpExpiryMinutes,
   }
 
-  if (useSender && MSG91_SENDER_ID) {
-    params.sender = MSG91_SENDER_ID
+  if (fast2sms.variablesValues) {
+    body.variables_values = fast2sms.variablesValues
   }
 
-  return axios.post(
-    `${MSG91_BASE_URL}/otp`,
-    {},
+  const response = await axios.post(`${fast2sms.baseUrl}${fast2sms.smartSendPath}`, body, {
+    headers: fast2smsHeaders(),
+    timeout: 15000,
+  })
+
+  return { response, otpHash: null }
+}
+
+async function sendOtpViaLocalBulk(normalizedMobile) {
+  const otp = generateOtpCode()
+  const message = fast2sms.localMessage.replaceAll('##OTP##', otp)
+
+  const response = await axios.post(
+    `${fast2sms.baseUrl}${fast2sms.bulkPath}`,
     {
-      params,
-      headers: {
-        authkey: MSG91_AUTH_KEY,
-        'Content-Type': 'application/json',
-      },
+      route: fast2sms.localRoute,
+      message,
+      numbers: normalizedMobile,
+    },
+    {
+      headers: fast2smsHeaders(),
+      timeout: 15000,
+    },
+  )
+
+  return { response, otpHash: hashOtpCode(otp) }
+}
+
+async function sendOtpToMobile(normalizedMobile) {
+  if (fast2sms.mode === 'smart') {
+    return sendOtpViaSmartApi(normalizedMobile)
+  }
+  return sendOtpViaLocalBulk(normalizedMobile)
+}
+
+async function verifyOtpForMobile(normalizedMobile, otp) {
+  return axios.post(
+    `${fast2sms.baseUrl}${fast2sms.smartVerifyPath}`,
+    {
+      mobile: normalizedMobile,
+      otp,
+    },
+    {
+      headers: fast2smsHeaders(),
       timeout: 15000,
     },
   )
 }
 
-async function verifyOtpForMobile(normalizedMobile, otp) {
-  return axios.get(`${MSG91_BASE_URL}/otp/verify`, {
-    params: {
-      mobile: `91${normalizedMobile}`,
-      otp,
-      otp_expiry: MSG91_OTP_EXPIRY_MINUTES,
-    },
-    headers: { authkey: MSG91_AUTH_KEY },
-    timeout: 15000,
-  })
-}
-
 async function handleSendOtpRequest(normalizedMobile, res) {
-  const configError = validateMsg91Config()
+  const configError = validateFast2SmsConfig(fast2sms)
   if (configError) {
     return res.status(500).json({ success: false, message: configError })
   }
 
   try {
-    const response = await sendOtpToMobile(normalizedMobile)
-    console.log('MSG91 send response:', response.data)
+    const { response, otpHash } = await sendOtpToMobile(normalizedMobile)
+    console.log(`Fast2SMS send response (${fast2sms.mode}):`, response.data)
 
-    if (!isMsg91OtpSuccess(response.data)) {
+    if (!isFast2SmsSuccess(response.data)) {
       return res.status(400).json({
         success: false,
         message: response.data?.message || 'Failed to send OTP.',
@@ -579,7 +592,10 @@ async function handleSendOtpRequest(normalizedMobile, res) {
       })
     }
 
-    rememberOtpChallenge(normalizedMobile, response.data?.request_id)
+    rememberOtpChallenge(normalizedMobile, {
+      requestId: response.data?.request_id,
+      otpHash,
+    })
     return res.json({
       success: true,
       message: 'OTP sent successfully to your mobile number.',
@@ -590,7 +606,7 @@ async function handleSendOtpRequest(normalizedMobile, res) {
   } catch (error) {
     const statusCode = error.response?.status || 500
     const apiError = error.response?.data || { message: error.message }
-    console.error('MSG91 send error:', apiError)
+    console.error('Fast2SMS send error:', apiError)
     return res.status(statusCode).json({
       success: false,
       message: apiError?.message || 'Failed to send OTP.',
@@ -604,7 +620,7 @@ async function handleVerifyOtpRequest(normalizedMobile, otp, res, { onVerified }
   if (!normalizedOtp) {
     return res.status(400).json({
       success: false,
-      message: `Please enter the valid ${MSG91_OTP_LENGTH}-digit OTP sent to your mobile.`,
+      message: `Please enter the valid ${fast2sms.otpLength}-digit OTP sent to your mobile.`,
     })
   }
 
@@ -624,16 +640,30 @@ async function handleVerifyOtpRequest(normalizedMobile, otp, res, { onVerified }
     })
   }
 
-  const configError = validateMsg91Config()
+  const configError = validateFast2SmsConfig(fast2sms)
   if (configError) {
     return res.status(500).json({ success: false, message: configError })
   }
 
+  if (fast2sms.mode === 'local') {
+    if (!challenge.otpHash || hashOtpCode(normalizedOtp) !== challenge.otpHash) {
+      challenge.attempts += 1
+      pendingOtpChallenges.set(normalizedMobile, challenge)
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid OTP. Please try again.',
+      })
+    }
+
+    clearOtpChallenge(normalizedMobile)
+    return onVerified({ mode: 'local' })
+  }
+
   try {
     const response = await verifyOtpForMobile(normalizedMobile, normalizedOtp)
-    console.log('MSG91 verify response:', response.data)
+    console.log('Fast2SMS verify response:', response.data)
 
-    if (!isMsg91OtpSuccess(response.data)) {
+    if (!isFast2SmsSuccess(response.data)) {
       challenge.attempts += 1
       pendingOtpChallenges.set(normalizedMobile, challenge)
       return res.status(400).json({
@@ -644,13 +674,13 @@ async function handleVerifyOtpRequest(normalizedMobile, otp, res, { onVerified }
     }
 
     clearOtpChallenge(normalizedMobile)
-    return onVerified({ msg91: response.data })
+    return onVerified({ fast2sms: response.data })
   } catch (error) {
     challenge.attempts += 1
     pendingOtpChallenges.set(normalizedMobile, challenge)
     const statusCode = error.response?.status || 500
     const apiError = error.response?.data || { message: error.message }
-    console.error('MSG91 verify error:', apiError)
+    console.error('Fast2SMS verify error:', apiError)
     return res.status(statusCode >= 400 && statusCode < 600 ? 400 : statusCode).json({
       success: false,
       message: apiError?.message || 'Invalid OTP. Please try again.',
@@ -1498,12 +1528,20 @@ app.use((error, _req, res, next) => {
   return next(error)
 })
 
-app.listen(PORT, () => {
-  console.log(`Backend running on port ${PORT}`)
-  console.log(
-    `OTP mode: LIVE MSG91 only — ${MSG91_OTP_LENGTH}-digit codes verified via MSG91 (no debug bypass)`,
-  )
-  if (!MSG91_AUTH_KEY || !MSG91_TEMPLATE_ID) {
-    console.warn('WARNING: MSG91_AUTH_KEY or MSG91_TEMPLATE_ID missing — OTP send/verify will fail.')
+const server = app.listen(PORT, () => {
+  console.log(`Backend running on http://localhost:${PORT}`)
+  console.log(`OTP mode: ${describeFast2SmsMode(fast2sms)}`)
+  const configError = validateFast2SmsConfig(fast2sms)
+  if (configError) {
+    console.warn(`WARNING: ${configError} — OTP send/verify will fail.`)
   }
+})
+
+server.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    console.error(`Port ${PORT} is already in use. Stop the other backend process and retry.`)
+  } else {
+    console.error('Failed to start server:', error.message)
+  }
+  process.exit(1)
 })

@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { isOtpVerifyAccepted, otpFailureMessage } from '../utils/otpValidation'
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
+import { API_BASE } from '../config/api'
 const OTP_LENGTH = 6
 const RESEND_SECONDS = 60
 
@@ -58,12 +57,14 @@ function OtpVerificationSheet({ mobile, onClose, onVerified }) {
     if (char && index < OTP_LENGTH - 1) {
       inputRefs.current[index + 1]?.focus()
     }
-    if (updated.every((d) => d !== '')) {
-      queueMicrotask(() => handleVerifyWith(updated.join('')))
-    }
   }
 
   function handleKeyDown(index, event) {
+    if (event.key === 'Enter' && digits.every((d) => d !== '')) {
+      event.preventDefault()
+      handleVerifyWith(digits.join(''))
+      return
+    }
     if (event.key === 'Backspace') {
       if (digits[index]) {
         const updated = [...digits]
@@ -83,9 +84,6 @@ function OtpVerificationSheet({ mobile, onClose, onVerified }) {
     setDigits(updated)
     const focusIdx = Math.min(pasted.length, OTP_LENGTH - 1)
     inputRefs.current[focusIdx]?.focus()
-    if (pasted.length === OTP_LENGTH) {
-      queueMicrotask(() => handleVerifyWith(pasted))
-    }
   }
 
   async function handleResend() {
@@ -138,7 +136,8 @@ function OtpVerificationSheet({ mobile, onClose, onVerified }) {
           </button>
         </div>
         <p className="mb-5 text-sm text-slate-500 sm:mb-6">
-          Please enter the 6-digit OTP sent to +91 {String(mobile || '').replace(/\D/g, '')}
+          Enter the 6-digit OTP sent to +91 {String(mobile || '').replace(/\D/g, '')}, then tap
+          Verify OTP to continue.
         </p>
 
         <div className="flex justify-between gap-2 sm:gap-3" onPaste={handlePaste}>

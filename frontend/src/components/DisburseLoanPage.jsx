@@ -4,7 +4,7 @@ import { SectionCard, InfoRow, StatusBadge, DownloadLink, SupportSection } from 
 import { formatCurrency } from '../utils/loanCalculator'
 import { COMPANY } from '../website/websiteContent'
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
+import { API_BASE } from '../config/api'
 
 function maskAccount(value) {
   const digits = String(value || '')
