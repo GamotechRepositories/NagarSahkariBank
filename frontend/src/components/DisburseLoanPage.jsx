@@ -2,6 +2,7 @@ import { useState } from 'react'
 import LoanProcessLayout from './LoanProcessLayout'
 import { SectionCard, InfoRow, StatusBadge, DownloadLink, SupportSection } from './ProcessUi'
 import { formatCurrency } from '../utils/loanCalculator'
+import { COMPANY } from '../website/websiteContent'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
 
@@ -81,7 +82,7 @@ function DisburseLoanPage({ user, userToken, onContinue, onBack }) {
             {user?.fullName ? ` to ${user.fullName}` : ''}.
           </p>
           <p className="mt-2 text-sm text-slate-500">
-            Continue to your SAKAAR MICROCREDIT FOUNDATION account to view your full profile.
+            Continue to your {COMPANY.name} account to view your full profile.
           </p>
         </div>
       </SectionCard>

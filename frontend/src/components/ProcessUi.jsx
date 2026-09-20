@@ -1,3 +1,5 @@
+import { COMPANY } from '../website/websiteContent'
+
 export function SectionCard({ title, children, className = '' }) {
   return (
     <section className={`rounded-xl border border-slate-200 bg-white p-4 ${className}`}>
@@ -148,8 +150,8 @@ export function SupportSection() {
     <SectionCard title="Customer Support">
       <p className="text-sm text-slate-600">Need help? Reach out to our support team.</p>
       <div className="mt-3 space-y-1 text-sm text-slate-700">
-        <p>Phone: <span className="font-medium">+91 81691 82144</span></p>
-        <p>Email: <span className="font-medium">info@sakaarfoundation.org</span></p>
+        <p>Phone: <span className="font-medium">{COMPANY.phone}</span></p>
+        <p>Email: <span className="font-medium">{COMPANY.email}</span></p>
       </div>
     </SectionCard>
   )

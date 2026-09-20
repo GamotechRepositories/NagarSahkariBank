@@ -1,3 +1,5 @@
+import { COMPANY } from '../website/websiteContent'
+
 function WelcomeProfilePopup({ profile, onViewProfile, onClose }) {
   return (
     <>
@@ -6,7 +8,7 @@ function WelcomeProfilePopup({ profile, onViewProfile, onClose }) {
         <div className="flex items-start justify-between gap-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--gold)]">
-              Sakaar Foundation
+              {COMPANY.name}
             </p>
             <h2 className="mt-2 text-2xl font-bold text-[var(--navy)]">Welcome back</h2>
           </div>

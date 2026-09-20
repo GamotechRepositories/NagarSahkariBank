@@ -7,7 +7,7 @@ function CsrPage({ onApplyNow, onNavigate }) {
       <PageHero
         eyebrow="Corporate Social Responsibility"
         title="Creating Sustainable Impact Beyond Financial Services"
-        description="At Sakaar Foundation, Corporate Social Responsibility is more than a commitment—it's a responsibility that drives everything we do. Our CSR initiatives focus on promoting financial inclusion, supporting education, encouraging entrepreneurship, empowering women, and improving the overall quality of life for underserved communities."
+        description="At Nagar Sahkari Bank Ltd. Etawah, Corporate Social Responsibility is more than a commitment—it's a responsibility that drives everything we do. Our CSR initiatives focus on promoting financial inclusion, supporting education, encouraging entrepreneurship, empowering women, and improving the overall quality of life for underserved communities."
       />
 
       <ContentSection>
@@ -36,7 +36,7 @@ function CsrPage({ onApplyNow, onNavigate }) {
       <ContentSection title="Our Approach">
         <div className="max-w-4xl rounded-2xl border border-slate-200 bg-white p-6 text-sm leading-relaxed text-slate-600 shadow-sm">
           <p>
-            Every CSR initiative undertaken by Sakaar Foundation is guided by a simple philosophy—create sustainable
+            Every CSR initiative undertaken by Nagar Sahkari Bank Ltd. Etawah is guided by a simple philosophy—create sustainable
             impact through meaningful action. Our initiatives are designed after understanding the unique needs of
             communities and are implemented with measurable outcomes in mind.
           </p>
@@ -54,7 +54,7 @@ function CsrPage({ onApplyNow, onNavigate }) {
       <ContentSection title="Partner With Us" className="bg-white">
         <div className="rounded-2xl border border-[var(--line)] bg-[var(--brand-soft)] p-6">
           <p className="text-sm leading-relaxed text-slate-700">
-            Sakaar Foundation welcomes partnerships with organizations, educational institutions, corporate entities,
+            Nagar Sahkari Bank Ltd. Etawah welcomes partnerships with organizations, educational institutions, corporate entities,
             NGOs, volunteers, and community leaders who share our vision of creating sustainable social impact.
             Together, we can develop initiatives that empower individuals, strengthen communities, and contribute to a
             financially inclusive and socially responsible India.

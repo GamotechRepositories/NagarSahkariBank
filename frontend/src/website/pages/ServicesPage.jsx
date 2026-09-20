@@ -4,7 +4,7 @@ import { CardGrid, ContentSection, CtaBanner, PageHero, ProcessGrid } from '../W
 const DETAILED_SERVICES = [
   {
     title: 'Personal Financial Assistance',
-    text: 'Financial requirements can arise at any stage of life. Sakaar Foundation provides responsible financial assistance to help individuals manage important personal needs with confidence and peace of mind.',
+    text: 'Financial requirements can arise at any stage of life. Nagar Sahkari Bank Ltd. Etawah provides responsible financial assistance to help individuals manage important personal needs with confidence and peace of mind.',
     items: ['Simple eligibility process', 'Minimal documentation', 'Quick application processing', 'Transparent communication'],
   },
   {
@@ -40,7 +40,7 @@ function ServicesPage({ onApplyNow, onNavigate }) {
       <PageHero
         eyebrow="Our Services"
         title="Empowering Individuals Through Responsible Financial Solutions"
-        description="At Sakaar Foundation, we are committed to making financial services simple, transparent, and accessible for every deserving individual. Our services combine technology, transparency, and professional support to ensure a smooth and reliable experience."
+        description="At Nagar Sahkari Bank Ltd. Etawah, we are committed to making financial services simple, transparent, and accessible for every deserving individual. Our services combine technology, transparency, and professional support to ensure a smooth and reliable experience."
       />
 
       <ContentSection title="Core Services">
@@ -67,7 +67,7 @@ function ServicesPage({ onApplyNow, onNavigate }) {
 
       <CtaBanner
         title="Let's Build a Better Financial Future Together"
-        subtitle="Whether you're seeking personal financial support, planning to grow your business, or looking for a trusted organization that values transparency and integrity, Sakaar Foundation is here to help."
+        subtitle="Whether you're seeking personal financial support, planning to grow your business, or looking for a trusted organization that values transparency and integrity, Nagar Sahkari Bank Ltd. Etawah is here to help."
         onApply={onApplyNow}
         onContact={() => onNavigate('contact')}
       />

@@ -10,6 +10,7 @@ import DisburseLoanPage from './components/DisburseLoanPage'
 import UserSignInModal from './components/UserSignInModal'
 import WelcomeProfilePopup from './components/WelcomeProfilePopup'
 import CompanyWebsite from './website/CompanyWebsite'
+import { COMPANY } from './website/websiteContent'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
 const USER_TOKEN_KEY = 'user_auth_token'
@@ -268,7 +269,7 @@ function App() {
     <main className="min-h-screen bg-slate-100 py-0 text-slate-800 lg:py-8">
       <div className="mx-auto w-full max-w-6xl bg-white shadow-sm lg:rounded-2xl lg:shadow-xl">
         <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-3 sm:px-6">
-          <img src="/logo.png" alt="Sakaar Foundation" className="h-9 w-auto object-contain sm:h-10" />
+          <img src="/logo.png" alt={COMPANY.name} className="h-9 w-auto object-contain sm:h-10" />
           <div className="flex items-center gap-2">
             <p className="hidden text-sm font-medium text-slate-500 sm:block">Loan Application</p>
             <button

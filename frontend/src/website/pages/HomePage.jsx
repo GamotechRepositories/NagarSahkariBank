@@ -111,29 +111,29 @@ function HomePage({ onApplyNow, onNavigate }) {
       </section>
 
       <ContentSection
-        title="About Sakaar Foundation"
+        title="About Nagar Sahkari Bank Ltd. Etawah"
         subtitle="Building Financial Independence for Every Individual"
       >
         <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr]">
           <div className="space-y-4 text-sm leading-relaxed text-slate-600 sm:text-base">
             <p>
-              Established in 2016, Sakaar Foundation is a professionally managed Section 8 Microcredit Foundation
-              dedicated to promoting financial inclusion and socio-economic development across India. Our objective is
-              to empower individuals and small entrepreneurs by providing responsible financial services that improve
-              livelihoods and encourage self-reliance.
+              Nagar Sahkari Bank Ltd. Etawah is a professionally managed co-operative bank dedicated to promoting
+              financial inclusion and socio-economic development. Our objective is to empower individuals and small
+              entrepreneurs by providing responsible financial services that improve livelihoods and encourage
+              self-reliance.
             </p>
             <p>
               Guided by our commitment to integrity, transparency, and customer satisfaction, we strive to bridge the
-              gap between underserved communities and accessible financial services. As a not-for-profit organization,
-              our focus remains on creating sustainable economic opportunities while supporting socially and
-              economically marginalized communities, especially women and families in rural and semi-urban areas.
+              gap between underserved communities and accessible financial services. As a co-operative bank, our focus
+              remains on creating sustainable economic opportunities while supporting socially and economically
+              marginalized communities, especially women and families in rural and semi-urban areas.
             </p>
           </div>
           <div className="rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-sm">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
               {[
-                { label: 'Founded', value: '2016' },
-                { label: 'Organization Type', value: 'Section 8 Foundation' },
+                { label: 'Location', value: 'Etawah' },
+                { label: 'Organization Type', value: 'Co-operative Bank' },
                 { label: 'Focus', value: 'Financial Inclusion' },
                 { label: 'Approach', value: 'Transparent & Digital' },
               ].map((stat) => (
@@ -148,7 +148,7 @@ function HomePage({ onApplyNow, onNavigate }) {
       </ContentSection>
 
       <ContentSection
-        title="Why Choose Sakaar Foundation"
+        title="Why Choose Nagar Sahkari Bank Ltd. Etawah"
         subtitle="Trusted Financial Solutions Designed Around You"
         className="bg-white"
       >
@@ -217,7 +217,7 @@ function HomePage({ onApplyNow, onNavigate }) {
 
       <CtaBanner
         title="Your Financial Growth Begins Here"
-        subtitle="Whether you're planning your future, expanding your business, or seeking reliable financial support, Sakaar Foundation is committed to helping you achieve your goals through responsible financial inclusion."
+        subtitle="Whether you're planning your future, expanding your business, or seeking reliable financial support, Nagar Sahkari Bank Ltd. Etawah is committed to helping you achieve your goals through responsible financial inclusion."
         onApply={onApplyNow}
         onContact={() => onNavigate('contact')}
       />

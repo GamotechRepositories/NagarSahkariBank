@@ -42,7 +42,7 @@ function ContactPage() {
       <PageHero
         eyebrow="Contact Us"
         title="We're Here to Help You"
-        description="At Sakaar Foundation, we value every inquiry and are committed to providing prompt, professional, and reliable assistance. Whether you have questions about our financial services or need guidance with the application process, our dedicated team is here to support you."
+        description="At Nagar Sahkari Bank Ltd. Etawah, we value every inquiry and are committed to providing prompt, professional, and reliable assistance. Whether you have questions about our financial services or need guidance with the application process, our dedicated team is here to support you."
       />
 
       <ContentSection>

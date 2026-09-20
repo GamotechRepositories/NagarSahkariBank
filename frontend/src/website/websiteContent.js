@@ -1,6 +1,6 @@
 export const COMPANY = {
-  name: 'Sakaar Foundation',
-  legalName: 'Sakaar Microcredit Foundation',
+  name: 'Nagar Sahkari Bank Ltd. Etawah',
+  legalName: 'Nagar Sahkari Bank Ltd. Etawah',
   tagline: 'Transforming Lives Through Financial Inclusion',
   phone: '+91 81691 82144',
   email: 'info@sakaarfoundation.org',
@@ -23,7 +23,7 @@ export const HOME_HERO = {
   title: 'Transforming Lives Through Financial Inclusion',
   subtitle: 'Empowering Individuals. Supporting Entrepreneurs. Strengthening Communities.',
   description:
-    'At Sakaar Foundation, we believe financial inclusion is the key to creating a stronger and more prosperous society. Since our inception, we have been committed to empowering individuals, supporting entrepreneurs, and uplifting underserved communities through responsible microfinance and transparent financial solutions.',
+    'At Nagar Sahkari Bank Ltd. Etawah, we believe financial inclusion is the key to creating a stronger and more prosperous society. Since our inception, we have been committed to empowering individuals, supporting entrepreneurs, and uplifting underserved communities through responsible microfinance and transparent financial solutions.',
   note: 'Our customer-first approach, simplified processes, and technology-driven services make financial assistance more accessible, secure, and reliable for everyone.',
   highlights: ['Quick Processing', 'Transparent Services', 'Secure Digital Platform'],
 }
@@ -129,7 +129,7 @@ export const CORE_VALUES = [
 export const TESTIMONIALS = [
   { name: 'Rajesh Sharma', role: 'Small Business Owner', quote: 'The entire process was smooth and transparent. The team explained every step clearly and provided excellent support throughout my journey.' },
   { name: 'Sunita Verma', role: 'Entrepreneur', quote: 'I truly appreciate the professionalism and customer-first approach. Their guidance helped me move forward with confidence.' },
-  { name: 'Amit Patel', role: 'Retail Business', quote: 'Quick response, transparent communication, and a very professional experience. I highly recommend Sakaar Foundation.' },
+  { name: 'Amit Patel', role: 'Retail Business', quote: 'Quick response, transparent communication, and a very professional experience. I highly recommend Nagar Sahkari Bank Ltd. Etawah.' },
   { name: 'Pooja Singh', role: 'Self-Employed Professional', quote: 'The digital process was simple and convenient. The team was always available whenever I needed assistance.' },
   { name: 'Rahul Yadav', role: 'Entrepreneur', quote: 'Excellent customer service and a hassle-free experience from application to completion.' },
   { name: 'Neha Gupta', role: 'Small Business Owner', quote: 'Their transparent approach gave me complete confidence. Every step was clearly communicated.' },
@@ -137,8 +137,8 @@ export const TESTIMONIALS = [
 
 export const HOME_FAQ = [
   {
-    q: 'What is Sakaar Foundation?',
-    a: 'Sakaar Foundation is a Section 8 organization dedicated to promoting financial inclusion by supporting individuals, entrepreneurs, and underserved communities through responsible financial solutions.',
+    q: 'What is Nagar Sahkari Bank Ltd. Etawah?',
+    a: 'Nagar Sahkari Bank Ltd. Etawah is a co-operative bank dedicated to promoting financial inclusion by supporting individuals, entrepreneurs, and underserved communities through responsible financial solutions.',
   },
   {
     q: 'Who can apply?',
@@ -153,7 +153,7 @@ export const HOME_FAQ = [
     a: 'Absolutely. We follow modern security standards and privacy practices to ensure customer information remains protected.',
   },
   {
-    q: 'How can I contact Sakaar Foundation?',
+    q: 'How can I contact Nagar Sahkari Bank Ltd. Etawah?',
     a: `You can contact us by phone at ${COMPANY.phone}, by email at ${COMPANY.email}, or by visiting our office during business hours.`,
   },
 ]
@@ -180,12 +180,12 @@ export const PRIVACY_SECTIONS = [
   {
     title: '1. Definitions',
     content:
-      'This Privacy Policy applies to Sakaar Microcredit Foundation. Personal Data includes information relating to an identified or identifiable natural person. Sensitive Personal Information includes financial information, KYC documents, and authentication credentials protected under applicable regulations.',
+      'This Privacy Policy applies to Nagar Sahkari Bank Ltd. Etawah. Personal Data includes information relating to an identified or identifiable natural person. Sensitive Personal Information includes financial information, KYC documents, and authentication credentials protected under applicable regulations.',
   },
   {
     title: '2. General',
     content:
-      'Sakaar Microcredit Foundation is committed to maintaining the highest standards of privacy, transparency, and information security. We collect only information reasonably necessary for legitimate business purposes, regulatory compliance, fraud prevention, and service delivery.',
+      'Nagar Sahkari Bank Ltd. Etawah is committed to maintaining the highest standards of privacy, transparency, and information security. We collect only information reasonably necessary for legitimate business purposes, regulatory compliance, fraud prevention, and service delivery.',
   },
   {
     title: '3. Scope and Acceptance',
@@ -220,7 +220,7 @@ export const PRIVACY_SECTIONS = [
   {
     title: '9. Grievance Redressal',
     content:
-      'For privacy-related concerns, contact our Data Protection Officer at info@sakaarfoundation.org. We will acknowledge and respond to complaints within applicable timelines.',
+      `For privacy-related concerns, contact our Data Protection Officer at ${COMPANY.email}. We will acknowledge and respond to complaints within applicable timelines.`,
   },
   {
     title: '10. Data Retention',
