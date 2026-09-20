@@ -29,6 +29,7 @@ const uploadsDir = path.join(__dirname, 'uploads')
 const dataDir = path.join(__dirname, 'data')
 const submissionsFile = path.join(dataDir, 'kyc-submissions.json')
 const usersFile = path.join(dataDir, 'users.json')
+const contactInquiriesFile = path.join(dataDir, 'contact-inquiries.json')
 
 fs.mkdirSync(uploadsDir, { recursive: true })
 fs.mkdirSync(dataDir, { recursive: true })
@@ -39,6 +40,10 @@ if (!fs.existsSync(submissionsFile)) {
 
 if (!fs.existsSync(usersFile)) {
   fs.writeFileSync(usersFile, '[]')
+}
+
+if (!fs.existsSync(contactInquiriesFile)) {
+  fs.writeFileSync(contactInquiriesFile, '[]')
 }
 
 const {
@@ -91,6 +96,18 @@ function readUsers() {
 
 function writeUsers(users) {
   fs.writeFileSync(usersFile, JSON.stringify(users, null, 2))
+}
+
+function readContactInquiries() {
+  try {
+    return JSON.parse(fs.readFileSync(contactInquiriesFile, 'utf8'))
+  } catch {
+    return []
+  }
+}
+
+function writeContactInquiries(inquiries) {
+  fs.writeFileSync(contactInquiriesFile, JSON.stringify(inquiries, null, 2))
 }
 
 function upsertUserProfile(profileData) {
@@ -339,6 +356,7 @@ function buildAdminStats() {
     disbursedLoans,
     totalDocuments,
     eSignConsents,
+    contactInquiries: readContactInquiries().length,
     latestSubmissionAt: submissions[0]?.submittedAt || null,
   }
 }
@@ -685,7 +703,7 @@ app.post('/api/user/login/send-otp', async (req, res) => {
   if (!user) {
     return res.status(404).json({
       success: false,
-      message: 'No account found for this mobile number. Please apply for a loan first.',
+      message: 'No account found for this mobile number. Please sign up first.',
     })
   }
 
@@ -761,7 +779,7 @@ function loginWithPasswordHandler(req, res) {
   if (!user) {
     return res.status(404).json({
       success: false,
-      message: 'No account found for this mobile number. Please apply for a loan first.',
+      message: 'No account found for this mobile number. Please sign up first.',
     })
   }
 
@@ -793,6 +811,107 @@ function loginWithPasswordHandler(req, res) {
 app.post('/api/user/login/password', loginWithPasswordHandler)
 // Alias for clients that post to /api/user/login
 app.post('/api/user/login', loginWithPasswordHandler)
+
+app.post('/api/contact', (req, res) => {
+  const fullName = String(req.body?.fullName || '').trim().slice(0, 120)
+  const mobile = normalizeIndianMobile(req.body?.mobile)
+  const email = String(req.body?.email || '').trim().toLowerCase().slice(0, 160)
+  const city = String(req.body?.city || '').trim().slice(0, 80)
+  const subject = String(req.body?.subject || '').trim().slice(0, 160)
+  const message = String(req.body?.message || '').trim().slice(0, 4000)
+
+  if (fullName.length < 2) {
+    return res.status(400).json({ success: false, message: 'Please enter your full name.' })
+  }
+  if (!mobile) {
+    return res
+      .status(400)
+      .json({ success: false, message: 'Please provide a valid 10 digit mobile number.' })
+  }
+  if (!email || !email.includes('@')) {
+    return res.status(400).json({ success: false, message: 'Please provide a valid email address.' })
+  }
+  if (subject.length < 2) {
+    return res.status(400).json({ success: false, message: 'Please enter a subject.' })
+  }
+  if (message.length < 5) {
+    return res.status(400).json({ success: false, message: 'Please enter your message.' })
+  }
+
+  const inquiries = readContactInquiries()
+  const inquiry = {
+    id: `CNT-${Date.now()}`,
+    fullName,
+    mobile,
+    email,
+    city,
+    subject,
+    message,
+    createdAt: new Date().toISOString(),
+  }
+  inquiries.unshift(inquiry)
+  writeContactInquiries(inquiries)
+
+  return res.json({
+    success: true,
+    message: 'Thank you for contacting us. Our team will respond within 24–48 business hours.',
+    data: { id: inquiry.id },
+  })
+})
+
+app.get('/api/admin/contact-inquiries', requireAdminAuth, (_req, res) => {
+  return res.json({ success: true, data: readContactInquiries() })
+})
+
+app.post('/api/user/register', (req, res) => {
+  const fullName = String(req.body?.fullName || '').trim()
+  const mobile = normalizeIndianMobile(req.body?.mobile)
+  const email = String(req.body?.email || '').trim().toLowerCase()
+  const password = String(req.body?.password || '')
+
+  if (fullName.length < 2) {
+    return res.status(400).json({ success: false, message: 'Please enter your full name.' })
+  }
+  if (!mobile) {
+    return res
+      .status(400)
+      .json({ success: false, message: 'Please provide a valid 10 digit mobile number.' })
+  }
+  if (!email || !email.includes('@')) {
+    return res.status(400).json({ success: false, message: 'Please provide a valid email address.' })
+  }
+  if (password.length < 6) {
+    return res.status(400).json({ success: false, message: 'Password must be at least 6 characters.' })
+  }
+
+  const existing = getUserByMobile(mobile)
+  if (existing?.passwordHash) {
+    return res.status(409).json({
+      success: false,
+      message: 'An account already exists for this mobile number. Please sign in.',
+    })
+  }
+
+  const user = upsertUserProfile({
+    mobile,
+    fullName,
+    email,
+    passwordHash: hashPassword(password),
+    username: existing?.username || mobile,
+    kycStatus: existing?.kycStatus || 'not_started',
+    loanStatus: existing?.loanStatus || 'none',
+    accountStatus: 'active',
+  })
+
+  return res.status(201).json({
+    success: true,
+    message: 'Account created successfully.',
+    data: {
+      token: issueUserToken(user),
+      user: toSafeUser(user),
+    },
+  })
+})
 
 app.post(
   '/api/kyc/submit',

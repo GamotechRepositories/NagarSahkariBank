@@ -2,40 +2,25 @@ const highlights = ['100% Online', 'Instant Disbursal', 'Flexible Repayments']
 
 function HeroSection() {
   return (
-    <section className="brand-hero-bg px-4 pb-5 pt-3 text-white lg:rounded-[1.25rem] lg:px-8 lg:pb-8 lg:pt-4">
-      <div className="mb-4 lg:mb-6">
-        <p className="mb-1 text-lg font-semibold lg:text-xl">Get Loans up to</p>
-        <p className="text-4xl font-extrabold tracking-tight lg:text-5xl">₹2,00,000</p>
-        <p className="mt-2 text-base lg:text-lg">Get cash in your account in just 5 minutes.</p>
-      </div>
-
-      {/* Mobile: compact accent list */}
-      <ul className="space-y-2 border-y border-[var(--gold)]/35 py-3 lg:hidden">
+    <section className="border-b border-[var(--line)] bg-[var(--brand-soft)] px-4 py-5 sm:px-6 lg:rounded-xl lg:border lg:px-8 lg:py-7">
+      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--brand)]">
+        Personal Loan
+      </p>
+      <p className="mt-3 text-sm text-slate-600">Get loans up to</p>
+      <p className="mt-1 text-4xl font-semibold tracking-tight text-[var(--navy)] lg:text-5xl">
+        ₹2,00,000
+      </p>
+      <p className="mt-2 text-sm text-slate-600 lg:text-base">
+        Disbursal to your bank account after successful verification.
+      </p>
+      <ul className="mt-5 space-y-2.5 border-t border-[var(--line)] pt-4">
         {highlights.map((item) => (
-          <li
-            key={item}
-            className="flex items-center gap-2.5 text-[13px] font-medium leading-none text-white"
-          >
-            <span
-              className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--gold)]"
-              aria-hidden="true"
-            />
+          <li key={item} className="flex items-center gap-2.5 text-sm text-slate-700">
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--gold)]" aria-hidden="true" />
             {item}
           </li>
         ))}
       </ul>
-
-      {/* Desktop: chips */}
-      <div className="hidden grid-cols-3 gap-4 lg:grid">
-        {highlights.map((item) => (
-          <div
-            key={item}
-            className="brand-chip rounded-2xl px-4 py-4 text-center text-base font-medium"
-          >
-            {item}
-          </div>
-        ))}
-      </div>
     </section>
   )
 }

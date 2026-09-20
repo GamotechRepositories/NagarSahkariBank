@@ -3,6 +3,17 @@ import { COMPANY } from '../websiteContent'
 import { Icon } from '../Icons'
 import { ContentSection, FaqList, PageHero } from '../WebsiteUi'
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'
+
+const EMPTY_FORM = {
+  fullName: '',
+  mobile: '',
+  email: '',
+  city: '',
+  subject: '',
+  message: '',
+}
+
 function ContactCard({ icon, title, children }) {
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -18,23 +29,55 @@ function ContactCard({ icon, title, children }) {
 }
 
 function ContactPage() {
-  const [form, setForm] = useState({
-    fullName: '',
-    mobile: '',
-    email: '',
-    city: '',
-    subject: '',
-    message: '',
-  })
+  const [form, setForm] = useState(EMPTY_FORM)
   const [submitted, setSubmitted] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   function handleChange(field) {
-    return (event) => setForm((prev) => ({ ...prev, [field]: event.target.value }))
+    return (event) => {
+      const value =
+        field === 'mobile' ? event.target.value.replace(/\D/g, '').slice(0, 10) : event.target.value
+      setForm((prev) => ({ ...prev, [field]: value }))
+      setError('')
+      setSubmitted(false)
+    }
   }
 
-  function handleSubmit(event) {
+  async function handleSubmit(event) {
     event.preventDefault()
-    setSubmitted(true)
+    if (loading) return
+
+    setLoading(true)
+    setError('')
+    setSubmitted(false)
+
+    try {
+      const response = await fetch(`${API_BASE}/api/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fullName: form.fullName.trim(),
+          mobile: form.mobile,
+          email: form.email.trim(),
+          city: form.city.trim(),
+          subject: form.subject.trim(),
+          message: form.message.trim(),
+        }),
+      })
+      const data = await response.json()
+
+      if (response.ok && data.success) {
+        setForm(EMPTY_FORM)
+        setSubmitted(true)
+      } else {
+        setError(data.message || 'Could not send your message. Please try again.')
+      }
+    } catch {
+      setError('Could not reach the server. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -42,24 +85,29 @@ function ContactPage() {
       <PageHero
         eyebrow="Contact Us"
         title="We're Here to Help You"
-        description="At Nagar Sahkari Bank Ltd. Etawah, we value every inquiry and are committed to providing prompt, professional, and reliable assistance. Whether you have questions about our financial services or need guidance with the application process, our dedicated team is here to support you."
+        description="Call our helpline, visit the branch at Raja Ganj-Tehsil Chauraha, Etawah, or write to us. We are here for deposits, loans, and everyday banking queries."
       />
 
       <ContentSection>
         <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
           <div className="space-y-4">
-            <ContactCard icon="phone" title="Phone">
+            <ContactCard icon="phone" title="Helpline">
               {COMPANY.phone}
             </ContactCard>
             <ContactCard icon="mail" title="Email">
               {COMPANY.email}
             </ContactCard>
-            <ContactCard icon="building" title="Corporate Office">
+            <ContactCard icon="building" title="Branch Address">
               {COMPANY.address}
             </ContactCard>
             <ContactCard icon="clock" title="Business Hours">
               <p>{COMPANY.hours}</p>
               <p className="mt-1">Sunday: Closed</p>
+            </ContactCard>
+            <ContactCard icon="netbanking" title="Website">
+              <a href={COMPANY.website} target="_blank" rel="noreferrer" className="text-[var(--brand)] hover:underline">
+                {COMPANY.website}
+              </a>
             </ContactCard>
           </div>
 
@@ -69,6 +117,9 @@ function ContactPage() {
               <p className="mt-4 rounded-lg bg-green-50 px-4 py-3 text-sm text-green-700">
                 Thank you for contacting us. Our team will respond within 24–48 business hours.
               </p>
+            )}
+            {error && (
+              <p className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
             )}
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
               {[
@@ -102,9 +153,10 @@ function ContactPage() {
             </div>
             <button
               type="submit"
-              className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[var(--brand)] px-5 py-3 text-sm font-semibold text-white hover:bg-[var(--brand-deep)]"
+              disabled={loading}
+              className="mt-5 inline-flex items-center gap-2 rounded-xl bg-[var(--brand)] px-5 py-3 text-sm font-semibold text-white hover:bg-[var(--brand-deep)] disabled:cursor-not-allowed disabled:bg-slate-300"
             >
-              Send Message
+              {loading ? 'Sending...' : 'Send Message'}
               <Icon name="arrow" className="h-4 w-4" />
             </button>
           </form>
@@ -116,15 +168,15 @@ function ContactPage() {
           items={[
             {
               q: 'How can I reach customer support?',
-              a: 'You can contact us by phone, email, or by submitting the inquiry form available on this page.',
+              a: `Call our helpline at ${COMPANY.phone} or email ${COMPANY.email}. You can also submit the inquiry form on this page.`,
             },
             {
-              q: 'Can I visit the office directly?',
-              a: 'Yes, you are welcome to visit our office during business hours. Scheduling an appointment in advance is recommended for faster assistance.',
+              q: 'Can I visit the branch directly?',
+              a: `Yes. Visit us at ${COMPANY.address} during business hours: ${COMPANY.hours}. Sunday is closed.`,
             },
             {
-              q: 'How quickly will I receive a response?',
-              a: 'Our team aims to respond to all inquiries within 24–48 business hours.',
+              q: 'Are deposits insured?',
+              a: 'Yes. The bank is registered with DICGC, Mumbai (sponsored by the Reserve Bank of India). Details are available at www.dicgc.org.in.',
             },
           ]}
         />

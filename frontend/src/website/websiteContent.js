@@ -1,13 +1,20 @@
 export const COMPANY = {
   name: 'Nagar Sahkari Bank Ltd. Etawah',
   legalName: 'Nagar Sahkari Bank Ltd. Etawah',
-  tagline: 'Transforming Lives Through Financial Inclusion',
-  phone: '+91 81691 82144',
-  email: 'info@sakaarfoundation.org',
-  website: 'https://sakaarfoundation.org',
-  address:
-    'Office No. 123, Topiwala Center, Off S. V. Road, Near BMC Market, Goregaon (West), Mumbai – 400104, Maharashtra, India',
+  logo: '/image.png',
+  tagline: 'Easy banking for the people of Etawah since 1997',
+  phone: '+91-9569639502',
+  email: 'digitalcomplaint@nsbetawah.in',
+  website: 'https://nsbetawah.in',
+  address: 'Raja Ganj-Tehsil Chauraha, Etawah-206001',
   hours: 'Monday – Saturday, 09:30 AM – 06:30 PM',
+  established: '18 October 1997',
+  founder: 'Shri Dayaram Prajapati (Ex. Cabinet Minister, Uttar Pradesh Government)',
+  rbiLicense:
+    'Licensed by the Reserve Bank of India under subsection 22(1), section 56(O) of the Banking Regulation Act, 1949',
+  cooperativeAct: 'Established under section 8 of the Uttar Pradesh Cooperative Act, 1965',
+  dicgc: 'Registered with DICGC, Mumbai (sponsored by the Reserve Bank of India)',
+  dicgcUrl: 'https://www.dicgc.org.in',
 }
 
 export const NAV_ITEMS = [
@@ -20,11 +27,11 @@ export const NAV_ITEMS = [
 ]
 
 export const HOME_HERO = {
-  title: 'Transforming Lives Through Financial Inclusion',
-  subtitle: 'Empowering Individuals. Supporting Entrepreneurs. Strengthening Communities.',
+  title: 'We have been working efficiently with loans and funding for 25 years.',
+  subtitle: 'Easy banking for the people of Etawah since 18 October 1997.',
   description:
-    'At Nagar Sahkari Bank Ltd. Etawah, we believe financial inclusion is the key to creating a stronger and more prosperous society. Since our inception, we have been committed to empowering individuals, supporting entrepreneurs, and uplifting underserved communities through responsible microfinance and transparent financial solutions.',
-  note: 'Our customer-first approach, simplified processes, and technology-driven services make financial assistance more accessible, secure, and reliable for everyone.',
+    'Nagar Sahkari Bank Ltd. Etawah is a co-operative bank licensed by the Reserve Bank of India, serving customers from Raja Ganj-Tehsil Chauraha, Etawah.',
+  note: 'Founded to make banking easier for the people of the region, we offer deposits, loans, and everyday banking services with the protection of DICGC deposit insurance.',
   highlights: ['Quick Processing', 'Transparent Services', 'Secure Digital Platform'],
 }
 
@@ -56,8 +63,8 @@ export const WHY_CHOOSE = [
   },
   {
     icon: 'map',
-    title: 'Expanding Financial Inclusion Across India',
-    text: 'We are committed to reaching individuals, entrepreneurs, and communities across India through responsible financial services and technology-driven accessibility.',
+    title: 'Local Banking in Etawah',
+    text: 'We serve individuals, families, and businesses in Etawah with branch banking, digital services, and responsible lending.',
   },
 ]
 
@@ -93,6 +100,99 @@ export const SERVICES = [
     text: 'Simplifying financial services through secure, technology-driven digital platforms and efficient customer support.',
   },
 ]
+
+export const BANKING_SERVICES = [
+  {
+    icon: 'transfer',
+    title: 'RTGS / NEFT',
+    text: 'Transfer funds securely across banks through RTGS and NEFT from your account.',
+  },
+  {
+    icon: 'sms',
+    title: 'SMS Facility',
+    text: 'Receive account alerts, transaction updates, and important bank notifications on your registered mobile.',
+  },
+  {
+    icon: 'locker',
+    title: 'Locker Facility',
+    text: 'Keep valuables and important documents safe with our safe-deposit locker facility.',
+  },
+  {
+    icon: 'card',
+    title: 'Debit Card',
+    text: 'Withdraw cash, shop at merchant outlets, and make everyday payments with your debit card.',
+  },
+  {
+    icon: 'netbanking',
+    title: 'Net Banking',
+    text: 'Access your account online to view statements, transfer funds, and manage banking services.',
+  },
+  {
+    icon: 'qr',
+    title: 'POS (QR Code)',
+    text: 'Accept and make digital payments quickly using POS and QR-code facilities.',
+  },
+  {
+    icon: 'fastag',
+    title: 'FASTag',
+    text: 'Pay highway tolls seamlessly with FASTag linked to your bank account.',
+  },
+  {
+    icon: 'phone',
+    title: 'Mobile App',
+    text: 'Manage selected banking services on the go through our mobile application.',
+  },
+]
+
+export const DEPOSIT_ACCOUNTS = [
+  {
+    icon: 'wallet',
+    title: 'Saving Account',
+    text: 'A convenient savings account to keep your money safe and accessible for everyday needs.',
+  },
+  {
+    icon: 'briefcase',
+    title: 'Current Account',
+    text: 'Current accounts for traders, professionals, and businesses that need frequent transactions.',
+  },
+  {
+    icon: 'locker',
+    title: 'Fixed Deposits',
+    text: 'Park surplus funds in fixed deposits and earn interest as per the bank’s published rates.',
+  },
+  {
+    icon: 'clock',
+    title: 'RD Account',
+    text: 'Build savings over time with a recurring deposit account suited to regular monthly deposits.',
+  },
+]
+
+export const LOAN_PRODUCTS = [
+  { icon: 'building', title: 'Home Loan', text: 'Finance the purchase or construction of a home as per bank norms.' },
+  { icon: 'fastag', title: 'Car Loan', text: 'Vehicle finance to help you buy a car with a structured repayment plan.' },
+  { icon: 'user', title: 'Personal Loan', text: 'Personal funding for essential needs, processed as per bank policy.' },
+  { icon: 'star', title: 'Gold Loan', text: 'Loans against gold ornaments for short-term liquidity.' },
+  { icon: 'briefcase', title: 'Business Loan', text: 'Credit support for traders and local businesses to meet working-capital needs.' },
+  { icon: 'card', title: 'Cash Credit Limit', text: 'Cash credit facilities to manage day-to-day business cash flow.' },
+  { icon: 'building', title: 'Loan Against Property', text: 'Loans against immovable property, subject to eligibility and documentation.' },
+  { icon: 'document', title: 'Loan Against NSC/KVP/LIC/FD', text: 'Loans against insurance policies, Kisan Vikas Patra, NSC, and fixed deposits.' },
+]
+
+export const NOTICE_BOARD = {
+  announcements: [
+    { title: 'DEAF Current Account', href: 'https://nsbetawah.in/' },
+    { title: 'DEAF Saving Account', href: 'https://nsbetawah.in/' },
+  ],
+  forms: [
+    { title: 'Latest Rate of Interests', href: 'https://nsbetawah.in/' },
+    { title: 'Saving A/C Opening Form', href: 'https://nsbetawah.in/' },
+    { title: 'NEFT / RTGS Form', href: 'https://nsbetawah.in/' },
+    { title: 'Nomination Form', href: 'https://nsbetawah.in/' },
+    { title: 'Aadhaar Linking Form', href: 'https://nsbetawah.in/' },
+    { title: 'List of Charges W.E.F. 01-01-2024', href: 'https://nsbetawah.in/' },
+    { title: 'List of Charges W.E.F. 01-02-2025', href: 'https://nsbetawah.in/' },
+  ],
+}
 
 export const PROCESS_STEPS = [
   {
@@ -138,33 +238,33 @@ export const TESTIMONIALS = [
 export const HOME_FAQ = [
   {
     q: 'What is Nagar Sahkari Bank Ltd. Etawah?',
-    a: 'Nagar Sahkari Bank Ltd. Etawah is a co-operative bank dedicated to promoting financial inclusion by supporting individuals, entrepreneurs, and underserved communities through responsible financial solutions.',
+    a: 'Nagar Sahkari Bank Ltd. Etawah is a co-operative bank established on 18 October 1997 under section 8 of the Uttar Pradesh Cooperative Act, 1965, and licensed by the Reserve Bank of India under the Banking Regulation Act, 1949.',
   },
   {
-    q: 'Who can apply?',
-    a: 'Eligible individuals, entrepreneurs, self-employed professionals, and small businesses meeting the required criteria can apply.',
+    q: 'Are deposits in the bank safe?',
+    a: 'Deposits are protected like those in nationalised banks under the Deposit Insurance and Credit Guarantee Corporation (DICGC), Mumbai, sponsored by the Reserve Bank of India. Learn more at dicgc.org.in.',
   },
   {
-    q: 'Is the application process completely digital?',
-    a: 'Yes. Our technology-driven process simplifies applications with secure digital documentation and verification.',
+    q: 'What deposit accounts are available?',
+    a: 'We offer Saving Accounts, Current Accounts, Fixed Deposits, and Recurring Deposit (RD) accounts.',
   },
   {
-    q: 'Is my personal information secure?',
-    a: 'Absolutely. We follow modern security standards and privacy practices to ensure customer information remains protected.',
+    q: 'What loans does the bank offer?',
+    a: 'Loans are disbursed on a priority basis as per RBI standards, including home, car, personal, gold, business, cash credit, loan against property, and loans against NSC, KVP, LIC, and fixed deposits. You can also apply online through our loan application flow.',
   },
   {
     q: 'How can I contact Nagar Sahkari Bank Ltd. Etawah?',
-    a: `You can contact us by phone at ${COMPANY.phone}, by email at ${COMPANY.email}, or by visiting our office during business hours.`,
+    a: `Visit us at ${COMPANY.address}, call our helpline at ${COMPANY.phone}, or email ${COMPANY.email}.`,
   },
 ]
 
 export const DIFFERENTIATORS = [
-  'Transparent Process',
-  'Professional Support',
-  'Responsible Financial Practices',
-  'Digital Convenience',
-  'Trusted Organization',
-  'Customer Satisfaction',
+  'RBI licensed co-operative bank',
+  'DICGC deposit insurance',
+  'Branch in Etawah',
+  'RTGS / NEFT and net banking',
+  'Locker, debit card and FASTag',
+  'Loans as per RBI priority norms',
 ]
 
 export const CSR_FOCUS = [

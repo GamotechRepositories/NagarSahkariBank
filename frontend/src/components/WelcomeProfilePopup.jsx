@@ -7,10 +7,12 @@ function WelcomeProfilePopup({ profile, onViewProfile, onClose }) {
       <div className="fixed left-1/2 top-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2 rounded-3xl bg-white p-6 shadow-2xl">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--gold)]">
-              {COMPANY.name}
-            </p>
-            <h2 className="mt-2 text-2xl font-bold text-[var(--navy)]">Welcome back</h2>
+            <img
+              src={COMPANY.logo}
+              alt={COMPANY.name}
+              className="h-9 w-auto max-w-[12rem] object-contain object-left sm:max-w-[14rem]"
+            />
+            <h2 className="mt-3 text-2xl font-bold text-[var(--navy)]">Welcome back</h2>
           </div>
           <button
             type="button"
@@ -42,7 +44,7 @@ function WelcomeProfilePopup({ profile, onViewProfile, onClose }) {
           <button
             type="button"
             onClick={onViewProfile}
-            className="flex-1 rounded-2xl bg-[var(--navy)] px-4 py-3 text-sm font-semibold text-white hover:bg-black"
+            className="flex-1 rounded-2xl bg-[var(--navy)] px-4 py-3 text-sm font-semibold text-white hover:bg-[var(--brand-deep)]"
           >
             View My Profile
           </button>

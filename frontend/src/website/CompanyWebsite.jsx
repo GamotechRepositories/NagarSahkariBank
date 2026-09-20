@@ -6,16 +6,19 @@ import ServicesPage from './pages/ServicesPage'
 import CsrPage from './pages/CsrPage'
 import ContactPage from './pages/ContactPage'
 import PrivacyPage from './pages/PrivacyPage'
+import SignUpPage from './pages/SignUpPage'
 import UserProfilePage from '../components/UserProfilePage'
 
 function CompanyWebsite({
   userProfile,
   userToken,
   profileMode,
+  signupRequest = 0,
   onApplyNow,
   onViewProfile,
   onLeaveProfile,
   onSignIn,
+  onRegistered,
   onLogout,
   onProfileRefresh,
 }) {
@@ -26,6 +29,12 @@ function CompanyWebsite({
       setCurrentPage('profile')
     }
   }, [profileMode])
+
+  useEffect(() => {
+    if (signupRequest > 0) {
+      setCurrentPage('signup')
+    }
+  }, [signupRequest])
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -72,6 +81,8 @@ function CompanyWebsite({
         return <ContactPage />
       case 'privacy':
         return <PrivacyPage />
+      case 'signup':
+        return <SignUpPage onRegistered={onRegistered} onSignIn={onSignIn} />
       default:
         return <HomePage {...commonProps} />
     }
@@ -79,11 +90,12 @@ function CompanyWebsite({
 
   return (
     <WebsiteLayout
-      currentPage={currentPage === 'profile' ? 'home' : currentPage}
+      currentPage={['profile', 'signup'].includes(currentPage) ? 'home' : currentPage}
       onNavigate={handleNavigate}
       onApplyNow={onApplyNow}
       onViewProfile={handleViewProfile}
       onSignIn={onSignIn}
+      onSignUp={() => handleNavigate('signup')}
       onLogout={onLogout}
       userProfile={userProfile}
     >

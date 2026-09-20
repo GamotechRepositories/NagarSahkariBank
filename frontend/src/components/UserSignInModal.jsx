@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { isOtpVerifyAccepted, otpFailureMessage } from '../utils/otpValidation'
+import { COMPANY } from '../website/websiteContent'
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
 const OTP_LENGTH = 6
 const RESEND_SECONDS = 60
 
-function UserSignInModal({ onClose, onSignedIn }) {
+function UserSignInModal({ onClose, onSignedIn, onSignUp }) {
   const [mode, setMode] = useState('password') // 'password' | 'otp'
   const [otpStep, setOtpStep] = useState('mobile') // 'mobile' | 'otp'
   const [mobile, setMobile] = useState('')
@@ -182,11 +183,16 @@ function UserSignInModal({ onClose, onSignedIn }) {
   return (
     <>
       <div className="fixed inset-0 z-50 bg-black/40" onClick={onClose} />
-      <div className="fixed inset-x-0 bottom-0 z-50 mx-auto w-full max-w-lg rounded-t-3xl bg-white px-6 pb-10 pt-6 shadow-2xl sm:inset-y-auto sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 sm:rounded-3xl">
+      <div className="fixed inset-x-0 bottom-0 z-50 mx-auto max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-t-3xl bg-white px-6 pb-10 pt-6 shadow-2xl sm:inset-y-auto sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 sm:rounded-3xl">
         <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-slate-200 sm:hidden" />
 
         <div className="mb-1 flex items-start justify-between gap-3">
           <div>
+            <img
+              src={COMPANY.logo}
+              alt={COMPANY.name}
+              className="mb-3 h-10 w-auto max-w-[15rem] object-contain object-left"
+            />
             <h2 className="text-2xl font-bold text-slate-900">Sign In</h2>
             <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
           </div>
@@ -197,6 +203,22 @@ function UserSignInModal({ onClose, onSignedIn }) {
             aria-label="Close"
           >
             ×
+          </button>
+        </div>
+
+        <div className="mt-5 grid grid-cols-2 gap-2 rounded-2xl bg-slate-100 p-1">
+          <button
+            type="button"
+            className="rounded-xl bg-white py-2.5 text-sm font-semibold text-slate-900 shadow-sm"
+          >
+            Sign In
+          </button>
+          <button
+            type="button"
+            onClick={onSignUp}
+            className="rounded-xl py-2.5 text-sm font-semibold text-slate-500 transition-colors hover:text-slate-700"
+          >
+            Sign Up
           </button>
         </div>
 
@@ -391,6 +413,16 @@ function UserSignInModal({ onClose, onSignedIn }) {
             </button>
           </div>
         )}
+            <p className="mt-4 text-center text-sm text-slate-500">
+              Don&apos;t have an account?{' '}
+              <button
+                type="button"
+                onClick={onSignUp}
+                className="font-semibold text-[var(--brand)] hover:underline"
+              >
+                Sign Up
+              </button>
+            </p>
       </div>
     </>
   )

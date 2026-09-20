@@ -1,0 +1,22 @@
+[
+  {
+    "id": "CNT-1789925402160",
+    "fullName": "Anita Sharma",
+    "mobile": "9876543210",
+    "email": "anita@example.com",
+    "city": "Etawah",
+    "subject": "Saving account query",
+    "message": "I would like to know the documents needed to open a saving account.",
+    "createdAt": "2026-09-20T17:30:02.160Z"
+  },
+  {
+    "id": "CNT-1789925368221",
+    "fullName": "Test User",
+    "mobile": "9569639502",
+    "email": "test@example.com",
+    "city": "Etawah",
+    "subject": "Locker inquiry",
+    "message": "Please share locker availability.",
+    "createdAt": "2026-09-20T17:29:28.221Z"
+  }
+]

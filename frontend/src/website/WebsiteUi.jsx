@@ -2,16 +2,19 @@ import { Icon, Stars } from './Icons'
 
 export function PageHero({ eyebrow, title, description, children }) {
   return (
-    <section className="brand-hero-bg px-4 py-16 text-white sm:px-6 lg:px-8 lg:py-20">
+    <section className="border-b border-[var(--line)] bg-[var(--navy)] px-4 py-12 text-white sm:px-6 lg:px-8 lg:py-16">
       <div className="mx-auto max-w-6xl">
         {eyebrow && (
-          <div className="mb-6 inline-flex rounded-2xl bg-white px-4 py-2">
-            <p className="text-sm font-bold text-[var(--navy)]">{eyebrow}</p>
-          </div>
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--gold)]">
+            {eyebrow}
+          </p>
         )}
-        <h1 className="max-w-4xl text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">{title}</h1>
+        <span className="mt-3 block h-0.5 w-12 bg-[var(--gold)]" aria-hidden="true" />
+        <h1 className="mt-5 max-w-4xl text-3xl font-semibold leading-tight sm:text-4xl lg:text-5xl">
+          {title}
+        </h1>
         {description && (
-          <p className="mt-5 max-w-3xl text-base leading-relaxed text-white/95 sm:text-lg">{description}</p>
+          <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/85 sm:text-base">{description}</p>
         )}
         {children}
       </div>
@@ -48,7 +51,7 @@ export function CardGrid({ items, columns = 3 }) {
       {items.map((item) => (
         <article
           key={item.title}
-          className="group rounded-2xl border border-slate-200/80 bg-white p-6 shadow-[0_10px_30px_rgba(16,35,58,0.05)] transition duration-300 hover:-translate-y-1 hover:border-sky-200 hover:shadow-[0_18px_40px_rgba(11,79,138,0.1)]"
+          className="group rounded-xl border border-[var(--line)] bg-white p-6 shadow-sm transition hover:border-[var(--brand)]/30 hover:shadow-md"
         >
           {item.icon && (
             <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--brand-soft)] text-[var(--brand)]">
@@ -67,6 +70,27 @@ export function CardGrid({ items, columns = 3 }) {
               ))}
             </ul>
           )}
+        </article>
+      ))}
+    </div>
+  )
+}
+
+export function BankingServiceGrid({ items }) {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {items.map((item) => (
+        <article
+          key={item.title}
+          className="flex gap-4 rounded-xl border border-[var(--line)] bg-white p-5 shadow-sm transition hover:border-[var(--brand)]/30"
+        >
+          <div className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-[var(--brand-soft)] text-[var(--brand)]">
+            <Icon name={item.icon} className="h-6 w-6" />
+          </div>
+          <div>
+            <h3 className="text-base font-semibold text-slate-900">{item.title}</h3>
+            <p className="mt-1 text-sm leading-relaxed text-slate-600">{item.text}</p>
+          </div>
         </article>
       ))}
     </div>
@@ -177,6 +201,67 @@ export function BulletGrid({ items }) {
   )
 }
 
+export function NoticeBoard({ announcements, forms }) {
+  return (
+    <div className="grid gap-6 lg:grid-cols-2">
+      <div className="rounded-xl border border-[var(--line)] bg-white p-6 shadow-sm">
+        <h3 className="text-lg font-semibold text-slate-900">Latest Announcements</h3>
+        <ol className="mt-4 space-y-2">
+          {announcements.map((item, index) => (
+            <li key={item.title}>
+              <a
+                href={item.href}
+                target="_blank"
+                rel="noreferrer"
+                className="text-sm text-[var(--brand)] underline-offset-2 hover:underline"
+              >
+                {index + 1}) {item.title} — Download
+              </a>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <div className="rounded-xl border border-[var(--line)] bg-white p-6 shadow-sm">
+        <h3 className="text-lg font-semibold text-slate-900">Forms & Interest Rates</h3>
+        <ol className="mt-4 space-y-2">
+          {forms.map((item, index) => (
+            <li key={item.title}>
+              <a
+                href={item.href}
+                target="_blank"
+                rel="noreferrer"
+                className="text-sm text-[var(--brand)] underline-offset-2 hover:underline"
+              >
+                {index + 1}) {item.title} — Download
+              </a>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </div>
+  )
+}
+
+export function DicgcBanner() {
+  return (
+    <section className="border-y border-[var(--line)] bg-white px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-6xl flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm font-semibold text-slate-800">
+          Nagar Sahkari Bank Ltd. is registered with DICGC
+        </p>
+        <a
+          href="https://www.dicgc.org.in"
+          target="_blank"
+          rel="noreferrer"
+          className="text-sm font-medium text-[var(--brand)] underline-offset-2 hover:underline"
+        >
+          www.dicgc.org.in
+        </a>
+      </div>
+    </section>
+  )
+}
+
 export function CtaBanner({ title, subtitle, onApply, onContact }) {
   return (
     <section className="brand-hero-bg px-4 py-14 text-white sm:px-6 lg:px-8">
@@ -189,7 +274,7 @@ export function CtaBanner({ title, subtitle, onApply, onContact }) {
           <button
             type="button"
             onClick={onApply}
-            className="inline-flex items-center gap-2 rounded-2xl bg-[var(--gold)] px-5 py-3 text-sm font-semibold text-white hover:bg-[#9a7234]"
+            className="inline-flex items-center gap-2 rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-[var(--navy)] hover:bg-[var(--brand-soft)]"
           >
             Apply Now
             <Icon name="arrow" className="h-4 w-4" />

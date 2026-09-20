@@ -1,7 +1,7 @@
 function CelebrationOverlay({ show, message = 'Loan amount applied!', amountLabel = '' }) {
   if (!show) return null
 
-  const colors = ['#0b254a', '#b5873e', '#16a34a', '#f59e0b']
+  const colors = ['#0f6b32', '#c4a035', '#0a4a23', '#14853f']
   const pieces = Array.from({ length: 24 }, (_, index) => index)
 
   return (

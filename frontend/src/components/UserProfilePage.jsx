@@ -525,7 +525,7 @@ function UserProfilePage({
           <button
             type="button"
             onClick={onLogout}
-            className="rounded-lg bg-[var(--navy)] px-3 py-2 text-sm font-medium text-white hover:bg-black"
+            className="rounded-lg bg-[var(--navy)] px-3 py-2 text-sm font-medium text-white hover:bg-[var(--brand-deep)]"
           >
             Sign Out
           </button>

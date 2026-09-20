@@ -41,6 +41,7 @@ function App() {
   const [checkingSession, setCheckingSession] = useState(Boolean(localStorage.getItem(USER_TOKEN_KEY)))
   const [showSignIn, setShowSignIn] = useState(false)
   const [showWelcomePopup, setShowWelcomePopup] = useState(false)
+  const [signupRequest, setSignupRequest] = useState(0)
 
   const cleanedMobile = mobileNumber.replace(/\D/g, '').slice(0, 10)
   const isMobileValid = cleanedMobile.length === 10
@@ -121,6 +122,31 @@ function App() {
     setStatus(null)
   }
 
+  function openSignUp() {
+    setShowSignIn(false)
+    setAppMode('website')
+    setSignupRequest((count) => count + 1)
+  }
+
+  async function completeUserSession({ token, user }) {
+    localStorage.setItem(USER_TOKEN_KEY, token)
+    setUserToken(token)
+    setUserProfile(user)
+    setShowSignIn(false)
+    setShowWelcomePopup(false)
+    if (user?.mobile) {
+      setMobileNumber(String(user.mobile).replace(/\D/g, '').slice(0, 10))
+    }
+    setAppMode('apply')
+    setCurrentStep(0)
+    setStatus(null)
+    try {
+      await loadUserProfile(token)
+    } catch {
+      // Keep signed-in user from auth response
+    }
+  }
+
   async function handleSendOtp() {
     if (!isOtpEnabled || loading) return
     setLoading(true)
@@ -160,29 +186,20 @@ function App() {
           userProfile={userProfile}
           userToken={userToken}
           profileMode={appMode === 'profile'}
+          signupRequest={signupRequest}
           onApplyNow={startApplication}
           onViewProfile={() => setAppMode('profile')}
           onLeaveProfile={() => setAppMode('website')}
-          onSignIn={() => setShowSignIn(true)}
+          onSignIn={startApplication}
+          onRegistered={completeUserSession}
           onLogout={clearUserSession}
           onProfileRefresh={setUserProfile}
         />
         {showSignIn && !userProfile ? (
           <UserSignInModal
             onClose={() => setShowSignIn(false)}
-            onSignedIn={async ({ token, user }) => {
-              localStorage.setItem(USER_TOKEN_KEY, token)
-              setUserToken(token)
-              setUserProfile(user)
-              setShowSignIn(false)
-              setAppMode('website')
-              setShowWelcomePopup(true)
-              try {
-                await loadUserProfile(token)
-              } catch {
-                // Keep signed-in user from login response
-              }
-            }}
+            onSignUp={openSignUp}
+            onSignedIn={completeUserSession}
           />
         ) : null}
         {showWelcomePopup && userProfile ? (
@@ -269,7 +286,11 @@ function App() {
     <main className="min-h-screen bg-slate-100 py-0 text-slate-800 lg:py-8">
       <div className="mx-auto w-full max-w-6xl bg-white shadow-sm lg:rounded-2xl lg:shadow-xl">
         <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-3 sm:px-6">
-          <img src="/logo.png" alt={COMPANY.name} className="h-9 w-auto object-contain sm:h-10" />
+          <img
+            src={COMPANY.logo}
+            alt={COMPANY.name}
+            className="h-9 w-auto max-w-[13rem] object-contain object-left sm:h-10 sm:max-w-[16rem]"
+          />
           <div className="flex items-center gap-2">
             <p className="hidden text-sm font-medium text-slate-500 sm:block">Loan Application</p>
             <button

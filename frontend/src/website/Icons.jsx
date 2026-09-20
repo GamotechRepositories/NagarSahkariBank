@@ -146,6 +146,62 @@ export function Icon({ name, className = 'h-5 w-5' }) {
           <path d="M13.73 21a2 2 0 0 1-3.46 0" />
         </svg>
       )
+    case 'transfer':
+      return (
+        <svg {...props}>
+          <path d="M7 8h13M16 4l4 4-4 4" />
+          <path d="M17 16H4M8 12l-4 4 4 4" />
+        </svg>
+      )
+    case 'sms':
+      return (
+        <svg {...props}>
+          <path d="M21 12a8 8 0 0 1-8 8H7l-4 3V12a8 8 0 1 1 18 0z" />
+          <path d="M8 11h.01M12 11h.01M16 11h.01" />
+        </svg>
+      )
+    case 'locker':
+      return (
+        <svg {...props}>
+          <rect x="4" y="8" width="16" height="13" rx="2" />
+          <path d="M8 8V6a4 4 0 0 1 8 0v2" />
+          <circle cx="12" cy="14.5" r="1.5" />
+        </svg>
+      )
+    case 'card':
+      return (
+        <svg {...props}>
+          <rect x="2" y="5" width="20" height="14" rx="2" />
+          <path d="M2 10h20M6 15h4" />
+        </svg>
+      )
+    case 'netbanking':
+      return (
+        <svg {...props}>
+          <rect x="3" y="4" width="18" height="13" rx="2" />
+          <path d="M8 21h8M12 17v4" />
+          <circle cx="12" cy="10.5" r="3" />
+          <path d="M12 7.5v6M9.2 10.5h5.6" />
+        </svg>
+      )
+    case 'qr':
+      return (
+        <svg {...props}>
+          <rect x="3" y="3" width="7" height="7" rx="1" />
+          <rect x="14" y="3" width="7" height="7" rx="1" />
+          <rect x="3" y="14" width="7" height="7" rx="1" />
+          <path d="M14 14h3v3h-3zM20 14v3M14 20h3M18 18h3v3" />
+        </svg>
+      )
+    case 'fastag':
+      return (
+        <svg {...props}>
+          <path d="M4 16h13l3-6H8l-4 6z" />
+          <circle cx="7.5" cy="17.5" r="1.5" />
+          <circle cx="15.5" cy="17.5" r="1.5" />
+          <path d="M9 7h6M10 4h4" />
+        </svg>
+      )
     default:
       return (
         <svg {...props}>

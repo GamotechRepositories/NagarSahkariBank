@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001'
 const TOKEN_KEY = 'admin_auth_token'
 
 const DOC_LABELS = {
@@ -56,6 +56,7 @@ const SIDEBAR_ITEMS = [
   { id: 'verified', label: 'Verified', statKey: 'verified', group: 'Applications' },
   { id: 'users', label: 'Total Users', statKey: 'totalUsers', group: 'Accounts' },
   { id: 'disbursed', label: 'Disbursed Loans', statKey: 'disbursedLoans', group: 'Accounts' },
+  { id: 'contact', label: 'Contact Inquiries', statKey: 'contactInquiries', group: 'Inquiries' },
 ]
 
 function getStoredToken() {
@@ -367,10 +368,29 @@ function ApplicantListCard({ submission, onOpen }) {
             </p>
             <p className="sm:col-span-2 text-slate-500">Updated {formatDate(lastUpdated)}</p>
           </div>
-          <p className="mt-3 text-sm font-medium text-slate-800">Review application →</p>
         </div>
       </div>
     </button>
+  )
+}
+
+function ContactInquiryCard({ inquiry }) {
+  return (
+    <article className="border-b border-slate-200 bg-white px-5 py-4 last:border-b-0">
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <div>
+          <p className="text-base font-semibold text-slate-900">{inquiry.fullName || 'Unnamed'}</p>
+          <p className="mt-1 text-sm font-medium text-slate-800">{inquiry.subject || '—'}</p>
+        </div>
+        <p className="text-xs text-slate-500">{formatDate(inquiry.createdAt)}</p>
+      </div>
+      <div className="mt-3 grid gap-1.5 text-sm text-slate-600 sm:grid-cols-2">
+        <p>Mobile: {inquiry.mobile || '—'}</p>
+        <p>Email: {inquiry.email || '—'}</p>
+        <p className="sm:col-span-2">City: {inquiry.city || '—'}</p>
+      </div>
+      <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-slate-700">{inquiry.message}</p>
+    </article>
   )
 }
 
@@ -542,6 +562,7 @@ function VerificationDetail({
 
 function Dashboard({ token, onLogout }) {
   const [submissions, setSubmissions] = useState([])
+  const [contactInquiries, setContactInquiries] = useState([])
   const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -564,11 +585,14 @@ function Dashboard({ token, onLogout }) {
       setError('')
     }
     try {
-      const [submissionsRes, statsRes] = await Promise.all([
+      const [submissionsRes, statsRes, contactRes] = await Promise.all([
         fetch(`${API_BASE}/api/kyc/submissions`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
         fetch(`${API_BASE}/api/admin/stats`, {
+          headers: { Authorization: `Bearer ${token}` },
+        }),
+        fetch(`${API_BASE}/api/admin/contact-inquiries`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ])
@@ -580,6 +604,7 @@ function Dashboard({ token, onLogout }) {
 
       const submissionsData = await submissionsRes.json()
       const statsData = await statsRes.json()
+      const contactData = await contactRes.json()
 
       if (submissionsRes.ok && submissionsData.success) {
         setSubmissions(submissionsData.data || [])
@@ -589,6 +614,10 @@ function Dashboard({ token, onLogout }) {
 
       if (statsRes.ok && statsData.success) {
         setStats(statsData.data)
+      }
+
+      if (contactRes.ok && contactData.success) {
+        setContactInquiries(contactData.data || [])
       }
     } catch {
       setError('Could not reach the server. Make sure the backend is running.')
@@ -721,6 +750,27 @@ function Dashboard({ token, onLogout }) {
     })
   }, [submissions, searchTerm, activeFilter])
 
+  const filteredContactInquiries = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase()
+    if (!query) return contactInquiries
+
+    return contactInquiries.filter((inquiry) => {
+      const haystack = [
+        inquiry.fullName,
+        inquiry.mobile,
+        inquiry.email,
+        inquiry.city,
+        inquiry.subject,
+        inquiry.message,
+        inquiry.id,
+      ]
+        .join(' ')
+        .toLowerCase()
+
+      return haystack.includes(query)
+    })
+  }, [contactInquiries, searchTerm])
+
   const selectedSubmission = submissions.find((item) => item.id === selectedId) || null
   const activeFilterLabel =
     SIDEBAR_ITEMS.find((item) => item.id === activeFilter)?.label || 'All Submissions'
@@ -759,7 +809,7 @@ function Dashboard({ token, onLogout }) {
             </div>
 
             <nav className="flex-1 overflow-y-auto px-3 pb-4">
-              {['Applications', 'Accounts'].map((group) => (
+              {['Applications', 'Accounts', 'Inquiries'].map((group) => (
                 <div key={group} className={group === 'Accounts' ? 'mt-6' : 'mt-1'}>
                   <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">
                     {group}
@@ -838,27 +888,53 @@ function Dashboard({ token, onLogout }) {
               <>
                 <header className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
                   <div>
-                    <p className="text-sm font-medium text-slate-500">Applicant verification</p>
+                    <p className="text-sm font-medium text-slate-500">
+                      {activeFilter === 'contact' ? 'Website messages' : 'Applicant verification'}
+                    </p>
                     <h2 className="mt-1 text-3xl font-semibold text-slate-900">{activeFilterLabel}</h2>
                     <p className="mt-2 text-sm text-slate-600">
-                      Open an applicant to verify each profile field and uploaded document.
+                      {activeFilter === 'contact'
+                        ? 'Messages submitted through the Contact Us form on the website.'
+                        : 'Open an applicant to verify each profile field and uploaded document.'}
                     </p>
                   </div>
                   <div className="w-full max-w-md">
                     <label className="mb-1.5 block text-sm font-medium text-slate-700">
-                      Search applicants
+                      {activeFilter === 'contact' ? 'Search inquiries' : 'Search applicants'}
                     </label>
                     <input
                       type="text"
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
-                      placeholder="Search by name, mobile, PAN, Aadhaar"
+                      placeholder={
+                        activeFilter === 'contact'
+                          ? 'Search by name, mobile, email, or subject'
+                          : 'Search by name, mobile, PAN, Aadhaar'
+                      }
                       className="w-full border border-slate-300 bg-white px-4 py-3 text-sm text-slate-800 outline-none focus:border-slate-500"
                     />
                   </div>
                 </header>
 
-                {loading ? (
+                {activeFilter === 'contact' ? (
+                  loading ? (
+                    <p className="border border-slate-200 bg-white px-6 py-12 text-center text-sm text-slate-500">
+                      Loading inquiries...
+                    </p>
+                  ) : filteredContactInquiries.length === 0 ? (
+                    <p className="border border-slate-200 bg-white px-6 py-12 text-center text-sm text-slate-500">
+                      {contactInquiries.length === 0
+                        ? 'No contact inquiries yet.'
+                        : 'No inquiries match the search.'}
+                    </p>
+                  ) : (
+                    <div className="space-y-0 divide-y divide-slate-200 border border-slate-200 bg-white">
+                      {filteredContactInquiries.map((inquiry) => (
+                        <ContactInquiryCard key={inquiry.id} inquiry={inquiry} />
+                      ))}
+                    </div>
+                  )
+                ) : loading ? (
                   <p className="border border-slate-200 bg-white px-6 py-12 text-center text-sm text-slate-500">
                     Loading applicants...
                   </p>

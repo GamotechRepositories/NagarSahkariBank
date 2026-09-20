@@ -7,7 +7,7 @@ function CsrPage({ onApplyNow, onNavigate }) {
       <PageHero
         eyebrow="Corporate Social Responsibility"
         title="Creating Sustainable Impact Beyond Financial Services"
-        description="At Nagar Sahkari Bank Ltd. Etawah, Corporate Social Responsibility is more than a commitment—it's a responsibility that drives everything we do. Our CSR initiatives focus on promoting financial inclusion, supporting education, encouraging entrepreneurship, empowering women, and improving the overall quality of life for underserved communities."
+        description="The bank was founded to make banking easier for the poor and backward people of the region. Our community work continues that purpose through inclusion, education, and local development."
       />
 
       <ContentSection>
@@ -15,8 +15,8 @@ function CsrPage({ onApplyNow, onNavigate }) {
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="text-xl font-bold text-slate-900">Our CSR Vision</h2>
             <p className="mt-4 text-sm leading-relaxed text-slate-600">
-              To build self-reliant communities by providing opportunities that promote financial independence,
-              education, entrepreneurship, and social well-being.
+              To continue the founder’s purpose: easy, dignified banking for the people of Etawah, with special care
+              for those who have historically had less access to formal finance.
             </p>
           </div>
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">

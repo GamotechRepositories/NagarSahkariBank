@@ -1,5 +1,5 @@
-import { PROCESS_STEPS, SERVICES } from '../websiteContent'
-import { CardGrid, ContentSection, CtaBanner, PageHero, ProcessGrid } from '../WebsiteUi'
+import { BANKING_SERVICES, DEPOSIT_ACCOUNTS, LOAN_PRODUCTS, NOTICE_BOARD, PROCESS_STEPS, SERVICES } from '../websiteContent'
+import { BankingServiceGrid, CardGrid, ContentSection, CtaBanner, DicgcBanner, NoticeBoard, PageHero, ProcessGrid } from '../WebsiteUi'
 
 const DETAILED_SERVICES = [
   {
@@ -39,15 +39,33 @@ function ServicesPage({ onApplyNow, onNavigate }) {
     <>
       <PageHero
         eyebrow="Our Services"
-        title="Empowering Individuals Through Responsible Financial Solutions"
-        description="At Nagar Sahkari Bank Ltd. Etawah, we are committed to making financial services simple, transparent, and accessible for every deserving individual. Our services combine technology, transparency, and professional support to ensure a smooth and reliable experience."
+        title="Deposits, Loans and Everyday Banking"
+        description="Nagar Sahkari Bank Ltd. Etawah offers deposit accounts, loans as per RBI priority norms, and core banking services including RTGS/NEFT, SMS, lockers, debit cards, net banking, POS (QR), FASTag, and mobile banking."
       />
 
-      <ContentSection title="Core Services">
+      <ContentSection
+        title="Banking Services"
+        subtitle="Core facilities available to account holders"
+      >
+        <BankingServiceGrid items={BANKING_SERVICES} />
+      </ContentSection>
+
+      <ContentSection title="Our Deposits" subtitle="Saving, current, fixed deposit, and RD accounts" className="bg-white">
+        <CardGrid items={DEPOSIT_ACCOUNTS} columns={4} />
+      </ContentSection>
+
+      <ContentSection
+        title="Our Loans"
+        subtitle="Disbursed on a priority basis as per Reserve Bank of India standards. We also lend against insurance policies, KVP, NSC, and fixed deposits."
+      >
+        <CardGrid items={LOAN_PRODUCTS} />
+      </ContentSection>
+
+      <ContentSection title="Loan & Financial Support" className="bg-white">
         <CardGrid items={SERVICES} />
       </ContentSection>
 
-      <ContentSection title="Detailed Service Offerings" className="bg-white">
+      <ContentSection title="Detailed Service Offerings">
         <CardGrid items={DETAILED_SERVICES} columns={2} />
       </ContentSection>
 
@@ -64,6 +82,15 @@ function ServicesPage({ onApplyNow, onNavigate }) {
           </p>
         </div>
       </ContentSection>
+
+      <ContentSection
+        title="Our Notice Board"
+        subtitle="Check announcements, interest rates, and forms. Downloads open on the official bank website."
+      >
+        <NoticeBoard announcements={NOTICE_BOARD.announcements} forms={NOTICE_BOARD.forms} />
+      </ContentSection>
+
+      <DicgcBanner />
 
       <CtaBanner
         title="Let's Build a Better Financial Future Together"

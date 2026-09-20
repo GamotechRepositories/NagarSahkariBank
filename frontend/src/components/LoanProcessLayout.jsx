@@ -1,3 +1,5 @@
+import { COMPANY } from '../website/websiteContent'
+
 const STEPS = [
   { number: 1, label: 'Enter\nBasic Details' },
   { number: 2, label: 'Approved\nOffer' },
@@ -91,7 +93,7 @@ function LoanProcessLayout({
     <main className="min-h-screen bg-slate-100 text-slate-800 lg:px-4 lg:py-6">
       <div className="relative mx-auto flex min-h-screen w-full max-w-5xl flex-col border-slate-200 bg-white shadow-sm lg:min-h-0 lg:rounded-2xl lg:border">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3 sm:px-6">
+        <div className="flex items-center justify-between gap-3 border-b border-slate-100 px-4 py-3 sm:px-6">
           {onBack ? (
             <button
               type="button"
@@ -102,8 +104,13 @@ function LoanProcessLayout({
               Back
             </button>
           ) : (
-            <div />
+            <div className="w-16" />
           )}
+          <img
+            src={COMPANY.logo}
+            alt={COMPANY.name}
+            className="h-9 w-auto max-w-[10rem] object-contain sm:h-10 sm:max-w-[14rem]"
+          />
           <select className="rounded-md border border-slate-200 bg-white px-2 py-1 text-xs text-slate-700">
             <option>English</option>
           </select>

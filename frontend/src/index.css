@@ -1,17 +1,18 @@
 @import "tailwindcss";
 
 :root {
-  --brand: #0b254a;
-  --brand-mid: #b5873e;
-  --brand-deep: #000000;
-  --brand-soft: #f4ebe0;
-  --gold: #b5873e;
-  --navy: #0b254a;
-  --ink: #000000;
-  --muted: #5c6570;
+  --brand: #0f6b32;
+  --brand-mid: #c4a035;
+  --brand-deep: #0a4a23;
+  --brand-soft: #eef5f0;
+  --gold: #c4a035;
+  --gold-deep: #9a7c22;
+  --navy: #0c3d22;
+  --ink: #14241a;
+  --muted: #5b6b61;
   --surface: #ffffff;
-  --surface-muted: #f7f5f2;
-  --line: #e4ddd3;
+  --surface-muted: #f4f7f5;
+  --line: #d7e2db;
   --white: #ffffff;
 }
 
@@ -79,12 +80,13 @@ body {
 }
 
 .brand-hero-bg {
-  background: linear-gradient(160deg, var(--navy) 0%, #071a36 55%, #000000 100%);
+  background: linear-gradient(165deg, #0c3d22 0%, #0a4a23 58%, #072e19 100%);
 }
 
 .brand-chip {
-  background: var(--gold);
+  background: rgba(255, 255, 255, 0.1);
   color: var(--white);
+  border: 1px solid rgba(196, 160, 53, 0.4);
 }
 
 .hero-girl-image {

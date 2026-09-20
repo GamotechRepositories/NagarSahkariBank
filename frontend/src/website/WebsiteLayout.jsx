@@ -20,6 +20,7 @@ export function WebsiteLayout({
   onApplyNow,
   onViewProfile,
   onSignIn,
+  onSignUp,
   onLogout,
   userProfile,
   children,
@@ -59,9 +60,9 @@ export function WebsiteLayout({
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6 sm:py-4">
           <button type="button" onClick={() => goTo('home')} className="shrink-0 text-left">
             <img
-              src="/logo.png"
+              src={COMPANY.logo}
               alt={COMPANY.name}
-              className="h-10 w-auto object-contain sm:h-12"
+              className="h-10 w-auto max-w-[11.5rem] object-contain object-left sm:h-12 sm:max-w-[16rem] lg:max-w-[18rem]"
             />
           </button>
 
@@ -74,7 +75,7 @@ export function WebsiteLayout({
                 className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
                   currentPage === item.id
                     ? 'bg-[var(--brand-soft)] text-[var(--navy)]'
-                    : 'text-black/70 hover:bg-black/5'
+                    : 'text-black/70 hover:bg-[var(--brand-deep)]/5'
                 }`}
               >
                 {item.label}
@@ -89,7 +90,7 @@ export function WebsiteLayout({
                 <button
                   type="button"
                   onClick={onViewProfile}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--navy)] text-xs font-bold text-white transition hover:bg-black lg:hidden"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--navy)] text-xs font-bold text-white transition hover:bg-[var(--brand-deep)] lg:hidden"
                   title="Open my profile"
                   aria-label="Open my profile"
                 >
@@ -98,7 +99,7 @@ export function WebsiteLayout({
                 <button
                   type="button"
                   onClick={onViewProfile}
-                  className="hidden max-w-[11rem] items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--brand-soft)] py-1.5 pl-1.5 pr-3 text-left transition hover:bg-[#ebe0d2] sm:max-w-none lg:inline-flex"
+                  className="hidden max-w-[11rem] items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--brand-soft)] py-1.5 pl-1.5 pr-3 text-left transition hover:bg-[var(--brand-soft)] sm:max-w-none lg:inline-flex"
                   title="Open my profile"
                 >
                   <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[var(--navy)] text-xs font-bold text-white">
@@ -119,20 +120,29 @@ export function WebsiteLayout({
                 </button>
               </>
             ) : (
-              <button
-                type="button"
-                onClick={onSignIn}
-                className="hidden rounded-lg border border-[var(--navy)] px-3 py-2 text-sm font-medium text-[var(--navy)] hover:bg-[var(--brand-soft)] lg:inline-flex"
-              >
-                Sign In
-              </button>
+              <div className="hidden items-center gap-2 lg:flex">
+                <button
+                  type="button"
+                  onClick={onSignIn}
+                  className="rounded-lg border border-[var(--navy)] px-3 py-2 text-sm font-medium text-[var(--navy)] hover:bg-[var(--brand-soft)]"
+                >
+                  Sign In
+                </button>
+                <button
+                  type="button"
+                  onClick={onSignUp}
+                  className="rounded-lg px-3 py-2 text-sm font-medium text-[var(--navy)] hover:bg-[var(--brand-soft)]"
+                >
+                  Sign Up
+                </button>
+              </div>
             )}
 
             {!userProfile && (
               <button
                 type="button"
                 onClick={onApplyNow}
-                className="inline-flex items-center gap-1.5 rounded-2xl bg-[var(--gold)] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[#9a7234] sm:gap-2 sm:px-4 sm:py-2.5"
+                className="inline-flex items-center gap-1.5 rounded-2xl bg-[var(--brand)] px-3.5 py-2 text-sm font-semibold text-white hover:bg-[var(--brand-deep)] sm:gap-2 sm:px-4 sm:py-2.5"
               >
                 Apply Now
                 <Icon name="arrow" className="h-4 w-4" />
@@ -174,7 +184,11 @@ export function WebsiteLayout({
           }`}
         >
           <div className="flex items-center justify-between border-b border-[var(--line)] px-4 py-4">
-            <img src="/logo.png" alt={COMPANY.name} className="h-9 w-auto object-contain" />
+            <img
+              src={COMPANY.logo}
+              alt={COMPANY.name}
+              className="h-9 w-auto max-w-[13rem] object-contain object-left"
+            />
             <button
               type="button"
               onClick={() => setMenuOpen(false)}
@@ -190,7 +204,7 @@ export function WebsiteLayout({
               <button
                 type="button"
                 onClick={openProfile}
-                className="flex w-full items-center gap-3 rounded-2xl border border-[var(--line)] bg-[var(--brand-soft)] px-3 py-3 text-left transition hover:bg-[#ebe0d2]"
+                className="flex w-full items-center gap-3 rounded-2xl border border-[var(--line)] bg-[var(--brand-soft)] px-3 py-3 text-left transition hover:bg-[var(--brand-soft)]"
               >
                 <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[var(--navy)] text-sm font-bold text-white">
                   {getProfileInitials(userProfile.fullName)}
@@ -246,7 +260,7 @@ export function WebsiteLayout({
                 className={`rounded-xl px-4 py-3.5 text-left text-sm font-medium transition ${
                   currentPage === item.id
                     ? 'bg-[var(--brand-soft)] text-[var(--navy)]'
-                    : 'text-black/80 hover:bg-black/5'
+                    : 'text-black/80 hover:bg-[var(--brand-deep)]/5'
                 }`}
               >
                 {item.label}
@@ -285,9 +299,9 @@ export function WebsiteLayout({
                   type="button"
                   onClick={() => {
                     setMenuOpen(false)
-                    onApplyNow()
+                    onSignUp?.()
                   }}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--gold)] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#9a7234]"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[var(--brand)] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[var(--brand-deep)]"
                 >
                   Sign Up
                   <Icon name="arrow" className="h-4 w-4" />
@@ -300,16 +314,18 @@ export function WebsiteLayout({
 
       <main>{children}</main>
 
-      <footer className="border-t border-black bg-black px-4 py-12 text-white/80 sm:px-6 lg:px-8">
+      <footer className="border-t border-[var(--navy)] bg-[var(--navy)] px-4 py-12 text-white/80 sm:px-6 lg:px-8">
         <div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-2 lg:grid-cols-4">
           <div>
-            <img
-              src="/whiteLogo.png"
-              alt={COMPANY.name}
-              className="h-12 w-auto object-contain"
-            />
+            <div className="inline-flex rounded-xl bg-white px-3 py-2">
+              <img
+                src={COMPANY.logo}
+                alt={COMPANY.name}
+                className="h-12 w-auto max-w-[16rem] object-contain object-left"
+              />
+            </div>
             <p className="mt-4 text-sm leading-relaxed text-white/60">
-              Empowering Individuals. Supporting Entrepreneurs. Strengthening Communities.
+              {COMPANY.tagline}. {COMPANY.dicgc}.
             </p>
           </div>
           <div>
@@ -345,7 +361,7 @@ export function WebsiteLayout({
           </div>
         </div>
         <p className="mx-auto mt-10 max-w-6xl border-t border-white/10 pt-6 text-center text-xs text-white/45">
-          © {new Date().getFullYear()} {COMPANY.legalName}. All rights reserved.
+          © {new Date().getFullYear()} {COMPANY.legalName}. All rights reserved. Registered with DICGC.
         </p>
       </footer>
     </div>
