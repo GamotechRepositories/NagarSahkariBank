@@ -1,3 +1,13 @@
+import deafCurrentAccountPdf from '../assets/Deaf Current Account.pdf'
+import deafSavingDepositorsPdf from '../assets/Deaf Saving Depositors.pdf'
+import latestRateOfInterestPdf from '../assets/latest rate of interest wef 01-02-2025.pdf'
+import savingFormPdf from '../assets/SAVING FORM.pdf'
+import neftRtgsFormPdf from '../assets/NEFT RTGS FORM.pdf'
+import nominationFormPdf from '../assets/NOMINATION FORM.pdf'
+import aadhaarLinkingFormPdf from '../assets/NPCI AADHAR LINKING FORM.pdf'
+import charges2024Pdf from '../assets/charges.pdf'
+import charges2025Pdf from '../assets/CHARGES updation 01-02-2025.pdf'
+
 export const COMPANY = {
   name: 'Nagar Sahkari Bank Ltd. Etawah',
   legalName: 'Nagar Sahkari Bank Ltd. Etawah',
@@ -180,17 +190,53 @@ export const LOAN_PRODUCTS = [
 
 export const NOTICE_BOARD = {
   announcements: [
-    { title: 'DEAF Current Account', href: 'https://nsbetawah.in/' },
-    { title: 'DEAF Saving Account', href: 'https://nsbetawah.in/' },
+    {
+      title: 'DEAF Current Account',
+      href: deafCurrentAccountPdf,
+      filename: 'DEAF Current Account.pdf',
+    },
+    {
+      title: 'DEAF Saving Account',
+      href: deafSavingDepositorsPdf,
+      filename: 'DEAF Saving Depositors.pdf',
+    },
   ],
   forms: [
-    { title: 'Latest Rate of Interests', href: 'https://nsbetawah.in/' },
-    { title: 'Saving A/C Opening Form', href: 'https://nsbetawah.in/' },
-    { title: 'NEFT / RTGS Form', href: 'https://nsbetawah.in/' },
-    { title: 'Nomination Form', href: 'https://nsbetawah.in/' },
-    { title: 'Aadhaar Linking Form', href: 'https://nsbetawah.in/' },
-    { title: 'List of Charges W.E.F. 01-01-2024', href: 'https://nsbetawah.in/' },
-    { title: 'List of Charges W.E.F. 01-02-2025', href: 'https://nsbetawah.in/' },
+    {
+      title: 'Latest Rate of Interests',
+      href: latestRateOfInterestPdf,
+      filename: 'Latest Rate of Interest W.E.F. 01-02-2025.pdf',
+    },
+    {
+      title: 'Saving A/C Opening Form',
+      href: savingFormPdf,
+      filename: 'Saving A-C Opening Form.pdf',
+    },
+    {
+      title: 'NEFT / RTGS Form',
+      href: neftRtgsFormPdf,
+      filename: 'NEFT RTGS Form.pdf',
+    },
+    {
+      title: 'Nomination Form',
+      href: nominationFormPdf,
+      filename: 'Nomination Form.pdf',
+    },
+    {
+      title: 'Aadhaar Linking Form',
+      href: aadhaarLinkingFormPdf,
+      filename: 'Aadhaar Linking Form.pdf',
+    },
+    {
+      title: 'List of Charges W.E.F. 01-01-2024',
+      href: charges2024Pdf,
+      filename: 'List of Charges W.E.F. 01-01-2024.pdf',
+    },
+    {
+      title: 'List of Charges W.E.F. 01-02-2025',
+      href: charges2025Pdf,
+      filename: 'List of Charges W.E.F. 01-02-2025.pdf',
+    },
   ],
 }
 

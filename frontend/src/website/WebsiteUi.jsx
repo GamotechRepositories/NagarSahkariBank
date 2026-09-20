@@ -201,6 +201,24 @@ export function BulletGrid({ items }) {
   )
 }
 
+function NoticeBoardItem({ item, index }) {
+  return (
+    <li className="flex items-center justify-between gap-3 rounded-lg border border-slate-100 px-3 py-2.5">
+      <span className="text-sm text-slate-700">
+        {index + 1}) {item.title}
+      </span>
+      <a
+        href={item.href}
+        download={item.filename}
+        className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-[var(--brand-soft)] px-3 py-1.5 text-xs font-semibold text-[var(--brand)] transition-colors hover:bg-[var(--brand)] hover:text-white"
+      >
+        <Icon name="download" className="h-3.5 w-3.5" />
+        Download
+      </a>
+    </li>
+  )
+}
+
 export function NoticeBoard({ announcements, forms }) {
   return (
     <div className="grid gap-6 lg:grid-cols-2">
@@ -208,16 +226,7 @@ export function NoticeBoard({ announcements, forms }) {
         <h3 className="text-lg font-semibold text-slate-900">Latest Announcements</h3>
         <ol className="mt-4 space-y-2">
           {announcements.map((item, index) => (
-            <li key={item.title}>
-              <a
-                href={item.href}
-                target="_blank"
-                rel="noreferrer"
-                className="text-sm text-[var(--brand)] underline-offset-2 hover:underline"
-              >
-                {index + 1}) {item.title} — Download
-              </a>
-            </li>
+            <NoticeBoardItem key={item.title} item={item} index={index} />
           ))}
         </ol>
       </div>
@@ -225,16 +234,7 @@ export function NoticeBoard({ announcements, forms }) {
         <h3 className="text-lg font-semibold text-slate-900">Forms & Interest Rates</h3>
         <ol className="mt-4 space-y-2">
           {forms.map((item, index) => (
-            <li key={item.title}>
-              <a
-                href={item.href}
-                target="_blank"
-                rel="noreferrer"
-                className="text-sm text-[var(--brand)] underline-offset-2 hover:underline"
-              >
-                {index + 1}) {item.title} — Download
-              </a>
-            </li>
+            <NoticeBoardItem key={item.title} item={item} index={index} />
           ))}
         </ol>
       </div>

@@ -85,7 +85,7 @@ function ServicesPage({ onApplyNow, onNavigate }) {
 
       <ContentSection
         title="Our Notice Board"
-        subtitle="Check announcements, interest rates, and forms. Downloads open on the official bank website."
+        subtitle="Download announcements, interest rates, and forms directly from Nagar Sahkari Bank Ltd. Etawah."
       >
         <NoticeBoard announcements={NOTICE_BOARD.announcements} forms={NOTICE_BOARD.forms} />
       </ContentSection>
