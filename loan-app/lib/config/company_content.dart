@@ -8,8 +8,8 @@ class Company {
   static const String legalName = 'Sakaar Microcredit Foundation';
   static const String tagline = 'Transforming Lives Through Financial Inclusion';
   static const String phone = '+91 81691 82144';
-  static const String email = 'info@sakaarfoundation.org';
-  static const String website = 'https://sakaarfoundation.org';
+  static const String email = 'banking@nsbletawah.com';
+  static const String website = 'https://www.nsbletawah.com';
   static const String address =
       'Office No. 123, Topiwala Center, Off S. V. Road, Near BMC Market, Goregaon (West), Mumbai – 400104, Maharashtra, India';
   static const String hours = 'Monday – Saturday, 09:30 AM – 06:30 PM';
@@ -381,7 +381,7 @@ const List<FaqItem> privacySections = [
   ),
   FaqItem(
     '9. Grievance Redressal',
-    'For privacy-related concerns, contact our Data Protection Officer at info@sakaarfoundation.org. We will acknowledge and respond to complaints within applicable timelines.',
+    'For privacy-related concerns, contact our Data Protection Officer at ${Company.email}. We will acknowledge and respond to complaints within applicable timelines.',
   ),
   FaqItem(
     '10. Data Retention',

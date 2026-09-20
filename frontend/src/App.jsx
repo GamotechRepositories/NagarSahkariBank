@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import HeroSection from './components/HeroSection'
 import LoanForm from './components/LoanForm'
 import LoanInfoSections from './components/LoanInfoSections'
-import OtpVerificationSheet from './components/OtpVerificationSheet'
+import OtpVerificationStep from './components/OtpVerificationStep'
 import BasicDetailsPage from './components/BasicDetailsPage'
 import ApprovedOfferPage from './components/ApprovedOfferPage'
 import CompleteKycPage from './components/CompleteKycPage'
@@ -21,7 +21,9 @@ function App() {
   const [consentThree, setConsentThree] = useState(false)
   const [loading, setLoading] = useState(false)
   const [status, setStatus] = useState(null)
-  const [showOtpSheet, setShowOtpSheet] = useState(false)
+  const [applyPhase, setApplyPhase] = useState('mobile')
+  const [otpSendError, setOtpSendError] = useState('')
+  const [otpSending, setOtpSending] = useState(false)
   const [otpVerifiedMobile, setOtpVerifiedMobile] = useState('')
   const [appMode, setAppMode] = useState('website')
   const [currentStep, setCurrentStep] = useState(0)
@@ -58,7 +60,7 @@ function App() {
   useEffect(() => {
     if (currentStep > 0 && !isCurrentMobileVerified) {
       setCurrentStep(0)
-      setShowOtpSheet(true)
+      setApplyPhase('otp')
     }
   }, [currentStep, isCurrentMobileVerified])
 
@@ -134,6 +136,8 @@ function App() {
   function startApplication() {
     setAppMode('apply')
     setCurrentStep(0)
+    setApplyPhase('mobile')
+    setOtpSendError('')
     setStatus(null)
   }
 
@@ -163,9 +167,13 @@ function App() {
   }
 
   async function handleSendOtp() {
-    if (!isOtpEnabled || loading) return
+    if (!isOtpEnabled || loading || otpSending) return
     setLoading(true)
+    setOtpSending(true)
+    setOtpSendError('')
     setStatus(null)
+    setOtpVerifiedMobile('')
+    setApplyPhase('otp')
     try {
       const response = await fetch(`${API_BASE}/api/otp/send`, {
         method: 'POST',
@@ -174,17 +182,28 @@ function App() {
       })
       const data = await response.json()
       if (response.ok && data.success) {
-        setOtpVerifiedMobile('')
-        setStatus(null)
-        setShowOtpSheet(true)
+        setOtpSendError('')
       } else {
-        setStatus({ type: 'error', message: data.message || 'Failed to send OTP.' })
+        setOtpSendError(data.message || 'Failed to send OTP.')
       }
     } catch {
-      setStatus({ type: 'error', message: 'Could not reach the server. Please try again.' })
+      setOtpSendError('Could not reach the server. Please try again.')
     } finally {
       setLoading(false)
+      setOtpSending(false)
     }
+  }
+
+  function handleOtpVerified() {
+    setOtpVerifiedMobile(cleanedMobile)
+    setApplyPhase('mobile')
+    setOtpSendError('')
+    setCurrentStep(1)
+  }
+
+  function handleOtpBack() {
+    setApplyPhase('mobile')
+    setOtpSendError('')
   }
 
   if (checkingSession) {
@@ -229,6 +248,18 @@ function App() {
           />
         ) : null}
       </>
+    )
+  }
+
+  if (appMode === 'apply' && currentStep === 0 && applyPhase === 'otp') {
+    return (
+      <OtpVerificationStep
+        mobile={cleanedMobile}
+        sending={otpSending}
+        sendError={otpSendError}
+        onBack={handleOtpBack}
+        onVerified={handleOtpVerified}
+      />
     )
   }
 
@@ -314,7 +345,7 @@ function App() {
               onClick={() => {
                 setAppMode('website')
                 setCurrentStep(0)
-                setShowOtpSheet(false)
+                setApplyPhase('mobile')
               }}
               className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50"
             >
@@ -377,18 +408,6 @@ function App() {
         </div>
       </div>
 
-      {showOtpSheet && (
-        <OtpVerificationSheet
-          mobile={cleanedMobile}
-          onClose={() => setShowOtpSheet(false)}
-          onVerified={() => {
-            setOtpVerifiedMobile(cleanedMobile)
-            setShowOtpSheet(false)
-            setStatus({ type: 'success', message: 'Mobile number verified successfully.' })
-            setCurrentStep(1)
-          }}
-        />
-      )}
     </main>
   )
 }
