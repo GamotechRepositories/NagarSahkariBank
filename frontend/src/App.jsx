@@ -170,12 +170,20 @@ function App() {
     }
     setAppMode('apply')
     setCurrentStep(0)
+    setApplyPhase('mobile')
+    setOtpVerifiedMobile('')
+    setOtpSendError('')
     setStatus(null)
     try {
       await loadUserProfile(token)
     } catch {
       // Keep signed-in user from auth response
     }
+  }
+
+  function handleChangeMobile() {
+    setApplyPhase('mobile')
+    setOtpSendError('')
   }
 
   async function handleSendOtp() {
@@ -379,6 +387,7 @@ function App() {
               otpSendError={otpSendError}
               otpSending={otpSending}
               onOtpVerified={handleOtpVerified}
+              onChangeMobile={handleChangeMobile}
             />
           </section>
 

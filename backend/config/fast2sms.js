@@ -78,8 +78,16 @@ export function validateFast2SmsConfig(config) {
 export function isFast2SmsSuccess(data) {
   if (!data || typeof data !== 'object') return false
   if (data.return !== true) return false
-  if (Number(data.status_code) !== 200) return false
-  return true
+  // Local bulk route (route q) returns { return: true, request_id } without status_code.
+  if (data.status_code == null) return true
+  return Number(data.status_code) === 200
+}
+
+export function fast2SmsMessage(data) {
+  const raw = data?.message
+  if (Array.isArray(raw)) return raw.join(' ')
+  if (typeof raw === 'string') return raw
+  return ''
 }
 
 export function describeFast2SmsMode(config) {

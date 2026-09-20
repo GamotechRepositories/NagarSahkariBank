@@ -1,10 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { isOtpVerifyAccepted, otpFailureMessage } from '../utils/otpValidation'
 import { COMPANY } from '../website/websiteContent'
-
+import OtpInputBlock from './OtpInputBlock'
 import { API_BASE } from '../config/api'
-const OTP_LENGTH = 6
-const RESEND_SECONDS = 60
 
 function UserSignInModal({ onClose, onSignedIn, onSignUp }) {
   const [mode, setMode] = useState('password') // 'password' | 'otp'
@@ -12,34 +10,21 @@ function UserSignInModal({ onClose, onSignedIn, onSignUp }) {
   const [mobile, setMobile] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
-  const [digits, setDigits] = useState(Array(OTP_LENGTH).fill(''))
-  const [timer, setTimer] = useState(RESEND_SECONDS)
+  const [otpComplete, setOtpComplete] = useState(false)
+  const [otpResetKey, setOtpResetKey] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const inputRefs = useRef([])
+  const otpRef = useRef(null)
 
   const cleanedMobile = mobile.replace(/\D/g, '').slice(0, 10)
   const isMobileValid = cleanedMobile.length === 10
-  const otpComplete = digits.every((d) => d !== '')
   const canSubmitPassword = isMobileValid && password.length >= 6
-
-  useEffect(() => {
-    if (mode !== 'otp' || otpStep !== 'otp' || timer <= 0) return
-    const id = setTimeout(() => setTimer((t) => t - 1), 1000)
-    return () => clearTimeout(id)
-  }, [mode, otpStep, timer])
-
-  useEffect(() => {
-    if (mode === 'otp' && otpStep === 'otp') {
-      inputRefs.current[0]?.focus()
-    }
-  }, [mode, otpStep])
 
   function switchMode(nextMode) {
     setMode(nextMode)
     setError('')
     setOtpStep('mobile')
-    setDigits(Array(OTP_LENGTH).fill(''))
+    setOtpResetKey((k) => k + 1)
     setPassword('')
   }
 
@@ -77,7 +62,7 @@ function UserSignInModal({ onClose, onSignedIn, onSignUp }) {
   }
 
   async function sendOtp() {
-    if (!isMobileValid || loading) return
+    if (!isMobileValid || loading) return false
     setLoading(true)
     setError('')
     try {
@@ -89,36 +74,26 @@ function UserSignInModal({ onClose, onSignedIn, onSignUp }) {
       const data = await response.json()
       if (response.ok && data.success) {
         setOtpStep('otp')
-        setTimer(RESEND_SECONDS)
-        setDigits(Array(OTP_LENGTH).fill(''))
-      } else {
-        setError(data.message || 'Failed to send OTP.')
+        setOtpResetKey((k) => k + 1)
+        return true
       }
+      setError(data.message || 'Failed to send OTP.')
+      return false
     } catch {
       setError('Could not reach the server. Please try again.')
+      return false
     } finally {
       setLoading(false)
     }
   }
 
   async function verifyOtp() {
-    await verifyOtpWith(digits.join(''))
-  }
-
-  function handleDigitChange(index, value) {
-    const char = value.replace(/\D/g, '').slice(-1)
-    const updated = [...digits]
-    updated[index] = char
-    setDigits(updated)
-    setError('')
-    if (char && index < OTP_LENGTH - 1) {
-      inputRefs.current[index + 1]?.focus()
-    }
+    await verifyOtpWith(otpRef.current?.getOtp?.() || '')
   }
 
   async function verifyOtpWith(otp) {
     const cleaned = String(otp || '').replace(/\D/g, '')
-    if (cleaned.length !== OTP_LENGTH || loading) return
+    if (cleaned.length !== 6 || loading) return
     setLoading(true)
     setError('')
     try {
@@ -132,43 +107,12 @@ function UserSignInModal({ onClose, onSignedIn, onSignUp }) {
         onSignedIn({ token: data.data.token, user: data.data.user })
       } else {
         setError(otpFailureMessage(data))
-        setDigits(Array(OTP_LENGTH).fill(''))
-        inputRefs.current[0]?.focus()
+        setOtpResetKey((k) => k + 1)
       }
     } catch {
       setError('Could not reach the server. Please try again.')
     } finally {
       setLoading(false)
-    }
-  }
-
-  function handleKeyDown(index, event) {
-    if (event.key === 'Backspace') {
-      if (digits[index]) {
-        const updated = [...digits]
-        updated[index] = ''
-        setDigits(updated)
-      } else if (index > 0) {
-        inputRefs.current[index - 1]?.focus()
-      }
-    }
-  }
-
-  function handlePaste(event) {
-    event.preventDefault()
-    const pasted = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, OTP_LENGTH)
-    const updated = Array(OTP_LENGTH).fill('')
-    for (let i = 0; i < pasted.length; i++) updated[i] = pasted[i]
-    setDigits(updated)
-    const focusIdx = Math.min(pasted.length, OTP_LENGTH - 1)
-    inputRefs.current[focusIdx]?.focus()
-  }
-
-  function handleOtpKeyDown(index, event) {
-    handleKeyDown(index, event)
-    if (event.key === 'Enter' && digits.every((d) => d !== '')) {
-      event.preventDefault()
-      verifyOtpWith(digits.join(''))
     }
   }
 
@@ -353,54 +297,22 @@ function UserSignInModal({ onClose, onSignedIn, onSignUp }) {
               onClick={() => {
                 setOtpStep('mobile')
                 setError('')
-                setDigits(Array(OTP_LENGTH).fill(''))
+                setOtpResetKey((k) => k + 1)
               }}
               className="mb-4 text-sm font-medium text-[var(--brand)] hover:underline"
             >
               ← Change mobile number
             </button>
 
-            <div className="flex justify-between gap-2" onPaste={handlePaste}>
-              {digits.map((digit, index) => (
-                <input
-                  key={index}
-                  ref={(el) => {
-                    inputRefs.current[index] = el
-                  }}
-                  type="tel"
-                  inputMode="numeric"
-                  autoComplete={index === 0 ? 'one-time-code' : 'off'}
-                  maxLength={1}
-                  value={digit}
-                  onChange={(e) => handleDigitChange(index, e.target.value)}
-                  onKeyDown={(e) => handleOtpKeyDown(index, e)}
-                  aria-label={`OTP digit ${index + 1}`}
-                  className={`h-14 w-full rounded-2xl border-2 text-center text-xl font-semibold text-slate-900 outline-none transition-colors ${
-                    digit
-                      ? 'border-[var(--brand)] bg-white'
-                      : 'border-slate-200 bg-slate-100'
-                  } focus:border-blue-500 focus:bg-white`}
-                />
-              ))}
-            </div>
-
-            {error ? <p className="mt-3 text-sm text-red-500">{error}</p> : null}
-
-            <div className="mt-5 text-center">
-              <p className="text-sm text-slate-500">Have not received your OTP?</p>
-              {timer > 0 ? (
-                <p className="mt-1 text-sm font-semibold text-green-600">Resend in {timer} seconds</p>
-              ) : (
-                <button
-                  type="button"
-                  onClick={sendOtp}
-                  disabled={loading}
-                  className="mt-1 text-sm font-semibold text-[var(--brand)] disabled:opacity-50"
-                >
-                  {loading ? 'Resending...' : 'Resend OTP'}
-                </button>
-              )}
-            </div>
+            <OtpInputBlock
+              ref={otpRef}
+              mobile={cleanedMobile}
+              onResend={sendOtp}
+              resending={loading}
+              error={error}
+              resetKey={otpResetKey}
+              onCompleteChange={setOtpComplete}
+            />
 
             <button
               type="button"

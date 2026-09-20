@@ -16,6 +16,7 @@ import {
 } from './utils/idValidation.js'
 import {
   describeFast2SmsMode,
+  fast2SmsMessage,
   isFast2SmsSuccess,
   loadFast2SmsConfig,
   validateFast2SmsConfig,
@@ -587,7 +588,7 @@ async function handleSendOtpRequest(normalizedMobile, res) {
     if (!isFast2SmsSuccess(response.data)) {
       return res.status(400).json({
         success: false,
-        message: response.data?.message || 'Failed to send OTP.',
+        message: fast2SmsMessage(response.data) || 'Failed to send OTP.',
         data: response.data,
       })
     }
