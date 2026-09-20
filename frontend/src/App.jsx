@@ -12,6 +12,13 @@ import WelcomeProfilePopup from './components/WelcomeProfilePopup'
 import CompanyWebsite from './website/CompanyWebsite'
 import { COMPANY } from './website/websiteContent'
 import { API_BASE } from './config/api'
+import {
+  clearOtpSession,
+  getOtpSession,
+  hasPendingOtpSession,
+  normalizeMobile,
+  saveOtpSession,
+} from './utils/otpSession'
 const USER_TOKEN_KEY = 'user_auth_token'
 
 function App() {
@@ -136,9 +143,17 @@ function App() {
   function startApplication() {
     setAppMode('apply')
     setCurrentStep(0)
-    setApplyPhase('mobile')
     setOtpSendError('')
     setStatus(null)
+
+    const pendingSession = getOtpSession()
+    if (pendingSession) {
+      setMobileNumber(pendingSession.mobile)
+      setApplyPhase('otp')
+      return
+    }
+
+    setApplyPhase('mobile')
   }
 
   function openSignUp() {
@@ -181,6 +196,7 @@ function App() {
       })
       const data = await response.json()
       if (response.ok && data.success) {
+        saveOtpSession(cleanedMobile)
         setOtpSendError('')
         setApplyPhase('otp')
       } else {
@@ -199,6 +215,7 @@ function App() {
   }
 
   function handleOtpVerified() {
+    clearOtpSession()
     setOtpVerifiedMobile(cleanedMobile)
     setApplyPhase('mobile')
     setOtpSendError('')
@@ -208,6 +225,13 @@ function App() {
   function handleOtpBack() {
     setApplyPhase('mobile')
     setOtpSendError('')
+  }
+
+  function handleContinueOtp() {
+    const pendingSession = getOtpSession()
+    if (!pendingSession) return
+    setMobileNumber(pendingSession.mobile)
+    setApplyPhase('otp')
   }
 
   if (checkingSession) {
@@ -256,9 +280,10 @@ function App() {
   }
 
   if (appMode === 'apply' && currentStep === 0 && applyPhase === 'otp') {
+    const otpMobile = normalizeMobile(cleanedMobile || getOtpSession()?.mobile)
     return (
       <OtpVerificationStep
-        mobile={cleanedMobile}
+        mobile={otpMobile}
         sending={otpSending}
         sendError={otpSendError}
         onBack={handleOtpBack}
@@ -378,6 +403,8 @@ function App() {
               status={status}
               setStatus={setStatus}
               onSendOtp={handleSendOtp}
+              hasPendingOtp={hasPendingOtpSession(cleanedMobile)}
+              onContinueOtp={handleContinueOtp}
             />
           </section>
 
@@ -400,13 +427,22 @@ function App() {
                 {status.message}
               </p>
             )}
+            {hasPendingOtpSession(cleanedMobile) ? (
+              <button
+                type="button"
+                onClick={handleContinueOtp}
+                className="mb-2 w-full rounded-xl border border-[var(--brand)] bg-white py-3 text-base font-semibold text-[var(--brand)]"
+              >
+                Continue to Enter OTP
+              </button>
+            ) : null}
             <button
               type="button"
               disabled={!isOtpEnabled || loading}
               onClick={handleSendOtp}
               className="w-full rounded-xl bg-[var(--brand)] py-3 text-base font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300"
             >
-              {loading ? 'Sending...' : 'Get OTP'}
+              {loading ? 'Sending...' : hasPendingOtpSession(cleanedMobile) ? 'Resend OTP' : 'Get OTP'}
             </button>
           </div>
         </div>

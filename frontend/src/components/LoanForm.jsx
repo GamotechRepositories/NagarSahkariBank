@@ -12,6 +12,8 @@ function LoanForm({
   status,
   setStatus,
   onSendOtp,
+  hasPendingOtp = false,
+  onContinueOtp,
 }) {
   return (
     <>
@@ -90,6 +92,21 @@ function LoanForm({
         </p>
       )}
 
+      {hasPendingOtp ? (
+        <div className="mt-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+          <p className="text-sm font-medium text-green-800">
+            OTP already sent to +91 {mobileNumber.replace(/\D/g, '').slice(0, 10)}. Session is active.
+          </p>
+          <button
+            type="button"
+            onClick={onContinueOtp}
+            className="mt-2 text-sm font-semibold text-[var(--brand)] hover:underline"
+          >
+            Continue to Enter OTP →
+          </button>
+        </div>
+      ) : null}
+
       {/* Desktop Get OTP button */}
       <button
         type="button"
@@ -97,7 +114,7 @@ function LoanForm({
         onClick={onSendOtp}
         className="mt-6 hidden w-full rounded-xl bg-[var(--brand)] py-3 text-base font-semibold text-white disabled:cursor-not-allowed disabled:bg-slate-300 lg:block"
       >
-        {loading ? 'Sending...' : 'Get OTP'}
+        {loading ? 'Sending...' : hasPendingOtp ? 'Resend OTP' : 'Get OTP'}
       </button>
     </>
   )

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { isOtpVerifyAccepted, otpFailureMessage } from '../utils/otpValidation'
 import { API_BASE } from '../config/api'
 import { COMPANY } from '../website/websiteContent'
+import { normalizeMobile, saveOtpSession } from '../utils/otpSession'
 
 const OTP_LENGTH = 6
 const RESEND_SECONDS = 60
@@ -19,6 +20,7 @@ function OtpVerificationStep({
   const [verifying, setVerifying] = useState(false)
   const [error, setError] = useState('')
   const inputRefs = useRef([])
+  const normalizedMobile = normalizeMobile(mobile)
 
   useEffect(() => {
     if (timer <= 0) return
@@ -39,7 +41,7 @@ function OtpVerificationStep({
       const response = await fetch(`${API_BASE}/api/otp/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mobile, otp: cleaned }),
+        body: JSON.stringify({ mobile: normalizedMobile, otp: cleaned }),
       })
       const data = await response.json()
       if (response.ok && isOtpVerifyAccepted(data)) {
@@ -102,13 +104,14 @@ function OtpVerificationStep({
       const response = await fetch(`${API_BASE}/api/otp/send`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mobile }),
+        body: JSON.stringify({ mobile: normalizedMobile }),
       })
       const data = await response.json()
       if (!response.ok || !data.success) {
         setError(data.message || 'Failed to resend OTP. Please try again.')
         return
       }
+      saveOtpSession(normalizedMobile)
       setTimer(RESEND_SECONDS)
       setDigits(Array(OTP_LENGTH).fill(''))
       inputRefs.current[0]?.focus()
@@ -147,8 +150,8 @@ function OtpVerificationStep({
           <h1 className="mt-2 text-2xl font-bold text-slate-900 sm:text-3xl">Enter OTP</h1>
           <p className="mt-3 text-sm leading-relaxed text-slate-600">
             {sending
-              ? `Sending OTP to +91 ${String(mobile || '').replace(/\D/g, '')}...`
-              : `Enter the 6-digit OTP sent to +91 ${String(mobile || '').replace(/\D/g, '')}, then tap Verify OTP to continue.`}
+              ? `Sending OTP to +91 ${normalizedMobile}...`
+              : `Enter the 6-digit OTP sent to +91 ${normalizedMobile}. Your verification session stays active for 10 minutes.`}
           </p>
 
           <div className="mt-8 flex justify-between gap-2 sm:gap-3" onPaste={handlePaste}>
